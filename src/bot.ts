@@ -9,6 +9,7 @@ if (!token) {
 
 const bot = new Telegraf(token);
 
+console.log('🤖 Бот запущен');
 bot.start((ctx) => ctx.reply('Бот запущен!'));
 bot.on('text', (ctx) => ctx.reply(`Ты написал: ${ctx.message.text}`));
 

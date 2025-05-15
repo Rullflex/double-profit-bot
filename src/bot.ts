@@ -1,8 +1,7 @@
 import { Telegraf } from 'telegraf';
 import dotenv from 'dotenv';
 import { setupLogger } from './logger';
-import { loadData, saveData } from './storage';
-import './handlers/ping';
+import { handleReset } from './handlers';
 
 dotenv.config();
 const logger = setupLogger();
@@ -16,7 +15,9 @@ if (!token) {
 const bot = new Telegraf(token);
 
 bot.start((ctx) => ctx.reply("🤖 Бот запущен и работает!"));
-bot.command("ping", (ctx) => ctx.reply("pong"));
+// bot.command("ping", (ctx) => ctx.reply("pong"));
+
+bot.command("reset", handleReset);
 
 bot.launch().then(() => logger.info("Бот успешно запущен"));
 

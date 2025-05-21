@@ -3,12 +3,18 @@
     "target": "ES2021",
     "module": "ESNext",
     "moduleResolution": "Node",
+    "pretty": true,
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
+    "baseUrl": ".",
     "outDir": "dist",
-    "rootDir": "src",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+    },
     "resolveJsonModule": true
   },
   "include": ["src"]

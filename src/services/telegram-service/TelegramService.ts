@@ -1,7 +1,10 @@
 import { Api } from "grammy";
+import { LoggerService } from "../logger-service";
 import { sleep } from "@/shared/utils";
 
 export class TelegramService {
+  private logger = new LoggerService("TelegramService");
+
   constructor(private readonly api: Api) {}
 
   async sendMessageWithRetry(
@@ -10,28 +13,26 @@ export class TelegramService {
     maxAttempts = 6,
     defaultDelay = 15000
   ): Promise<void> {
-    let attempt = 0;
-
-    while (attempt < maxAttempts) {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         await this.api.sendMessage(chatId, text);
+        this.logger.debug(`Message sent successfully to ${chatId}`);
         return;
       } catch (err: any) {
-        console.warn(`[TelegramService] Send attempt ${attempt + 1} failed:`, err?.message);
+        this.logger.warn(`Send attempt ${attempt + 1} failed: `, err?.message || err?.description || err);
 
         if (err?.description?.includes("Too Many Requests: retry after")) {
           const match = err.description.match(/retry after (\d+)/i);
           const retryAfter = match ? parseInt(match[1], 10) * 1000 : defaultDelay;
-          console.log(`[TelegramService] Rate limited. Sleeping for ${retryAfter} ms`);
+          this.logger.warn(`Rate limited. Retrying after ${retryAfter}ms`);
           await sleep(retryAfter);
         } else {
           await sleep(defaultDelay);
         }
-
-        attempt++;
       }
     }
 
+    this.logger.error(`Failed to send message to ${chatId} after ${maxAttempts} attempts`);
     throw new Error("Failed to send message after retries.");
   }
 
@@ -42,10 +43,12 @@ export class TelegramService {
       const idStr = rawChatData.slice(index + prefix.length).trim();
       const id = parseInt(idStr, 10);
       if (isNaN(id)) {
+        this.logger.error("Invalid chat ID format:", idStr);
         throw new Error("Invalid chat ID format");
       }
       return id;
     }
+    this.logger.error("Chat ID not found in raw string:", rawChatData);
     throw new Error("Chat ID not found in string");
   }
 }

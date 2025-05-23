@@ -1,14 +1,14 @@
 import { sheets_v4 } from "googleapis";
+import { DATA_SPREADSHEET_ID } from "./sheets.config";
 
 const CHAT_GROUP_LIST_FIRST_ROW = 3;
 const chatGroupListRange = `TelegramBot!D${CHAT_GROUP_LIST_FIRST_ROW}:I${CHAT_GROUP_LIST_FIRST_ROW}`;
 
 export async function getChatGroupList(
   sheets: sheets_v4.Sheets,
-  spreadsheetId: string
 ): Promise<string[]> {
   const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
+    spreadsheetId: DATA_SPREADSHEET_ID,
     range: chatGroupListRange,
     valueRenderOption: "UNFORMATTED_VALUE",
   });

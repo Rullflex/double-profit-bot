@@ -1,4 +1,5 @@
 import { sheets_v4 } from "googleapis";
+import { DATA_SPREADSHEET_ID } from "./sheets.config";
 
 export type CustomerData = {
   title: string;
@@ -11,10 +12,9 @@ const CUSTOMER_DATA_RANGE = "TelegramBot!K3:N";
 
 export async function getCustomerData(
   sheets: sheets_v4.Sheets,
-  spreadsheetId: string
 ): Promise<CustomerData[]> {
   const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
+    spreadsheetId: DATA_SPREADSHEET_ID,
     range: CUSTOMER_DATA_RANGE,
     valueRenderOption: "UNFORMATTED_VALUE",
   });

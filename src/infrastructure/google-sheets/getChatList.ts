@@ -1,14 +1,14 @@
 import { sheets_v4 } from "googleapis";
+import { DATA_SPREADSHEET_ID } from "./sheets.config";
 
 const CHAT_LIST_FIRST_ROW = 3;
 
 export async function getChatList(
   sheets: sheets_v4.Sheets,
-  spreadsheetId: string
 ): Promise<string[]> {
   const range = `TelegramBot!B${CHAT_LIST_FIRST_ROW}:B`;
   const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
+    spreadsheetId: DATA_SPREADSHEET_ID,
     range,
     valueRenderOption: "UNFORMATTED_VALUE",
   });
@@ -20,12 +20,11 @@ export async function getChatList(
 
 export async function getChatListByGroup(
   sheets: sheets_v4.Sheets,
-  spreadsheetId: string,
   rangeLetter: string
 ): Promise<string[]> {
   const range = `TelegramBot!${rangeLetter}${CHAT_LIST_FIRST_ROW + 1}:${rangeLetter}`;
   const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
+    spreadsheetId: DATA_SPREADSHEET_ID,
     range,
     valueRenderOption: "UNFORMATTED_VALUE",
   });
@@ -37,7 +36,6 @@ export async function getChatListByGroup(
 
 export async function updateChatList(
   sheets: sheets_v4.Sheets,
-  spreadsheetId: string,
   chatList: string[]
 ): Promise<void> {
   const endRow = CHAT_LIST_FIRST_ROW + chatList.length - 1;
@@ -53,7 +51,7 @@ export async function updateChatList(
   };
 
   await sheets.spreadsheets.values.batchUpdate({
-    spreadsheetId,
+    spreadsheetId: DATA_SPREADSHEET_ID,
     requestBody: request,
   });
 }

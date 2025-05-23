@@ -1,4 +1,5 @@
 import { sheets_v4 } from "googleapis";
+import { MONEY_SPREADSHEET_ID } from "./sheets.config";
 
 export type MoneyRemainData = {
   title: string;
@@ -14,10 +15,9 @@ const UPDATE_TIME_RANGE = "Остатки!G1:G1";
 
 export async function getCommonMoneyRemain(
   sheets: sheets_v4.Sheets,
-  spreadsheetId: string
 ): Promise<MoneyRemainData[]> {
   const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
+    spreadsheetId: MONEY_SPREADSHEET_ID,
     range: MONEY_REMAIN_RANGE,
     valueRenderOption: "UNFORMATTED_VALUE",
   });
@@ -60,11 +60,10 @@ export async function getCommonMoneyRemain(
 
 export async function updateCommonMoneyRemain(
   sheets: sheets_v4.Sheets,
-  spreadsheetId: string,
   moneyRemainData: MoneyRemainData[]
 ): Promise<void> {
   const elamaRemainRange: sheets_v4.Schema$ValueRange = {
-    range: `Остатки!G${MONEY_REMAIN_FIRST_ROW}:G${MONEY_REMAIN_FIRST_ROW + moneyRemainData.length - 1}`,
+    range: `${ELAMA_REMAIN_RANGE}${MONEY_REMAIN_FIRST_ROW + moneyRemainData.length - 1}`,
     values: moneyRemainData.map((item) => [item.elamaRemain]),
   };
 
@@ -79,7 +78,7 @@ export async function updateCommonMoneyRemain(
   };
 
   await sheets.spreadsheets.values.batchUpdate({
-    spreadsheetId,
+    spreadsheetId: MONEY_SPREADSHEET_ID,
     requestBody: request,
   });
 }

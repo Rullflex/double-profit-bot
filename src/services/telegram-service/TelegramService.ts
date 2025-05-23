@@ -1,6 +1,7 @@
 import { Api } from "grammy";
 import { LoggerService } from "../logger-service";
 import { sleep } from "@/shared/utils";
+import fetch from "node-fetch";
 
 export class TelegramService {
   private logger = new LoggerService("TelegramService");
@@ -16,7 +17,7 @@ export class TelegramService {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         await this.api.sendMessage(chatId, text);
-        this.logger.debug(`Message sent successfully to ${chatId}`);
+        this.logger.debug(`Message <${text}> sent successfully to <${chatId}>`);
         return;
       } catch (err: any) {
         this.logger.warn(`Send attempt ${attempt + 1} failed: `, err?.message || err?.description || err);
@@ -50,5 +51,23 @@ export class TelegramService {
     }
     this.logger.error("Chat ID not found in raw string:", rawChatData);
     throw new Error("Chat ID not found in string");
+  }
+
+  async getFile(fileId: string): Promise<Buffer> {
+    const file = await this.api.getFile(fileId);
+    const filePath = file.file_path;
+
+    if (!filePath) {
+      throw new Error("File path is undefined");
+    }
+
+    const response = await fetch(`https://api.telegram.org/file/bot${this.api.token}/${filePath}`);
+    if (!response.ok) {
+      this.logger.error(`Failed to download file: ${response.statusText}`);
+      throw new Error(`Failed to download file: ${response.statusText}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
   }
 }

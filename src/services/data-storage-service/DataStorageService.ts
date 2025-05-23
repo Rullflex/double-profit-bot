@@ -21,5 +21,3 @@ export class DataStorage {
     }
   }
 }
-
-export const globalStorage = new DataStorage();

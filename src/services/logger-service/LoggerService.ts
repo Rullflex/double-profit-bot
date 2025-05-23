@@ -1,5 +1,5 @@
 export class LoggerService {
-  constructor(private readonly scope: string = "Default") {}
+  constructor(private readonly scope: string = '') {}
 
   log(message: string, ...args: any[]): void {
     console.log(`[${this.scope}] ${message}`, ...args);
@@ -18,6 +18,8 @@ export class LoggerService {
       console.debug(`[${this.scope}] 🐛 ${message}`, ...args);
     }
   }
-}
 
-export const logger = new LoggerService();
+  withPrefix(prefix: string): LoggerService {
+    return new LoggerService(this.scope ? `${this.scope} > ${prefix}` : prefix);
+  }
+}

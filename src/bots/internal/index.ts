@@ -7,6 +7,14 @@ dotenv.config();
 async function main() {
   const app = await createAppContext(process.env.INTERNAL_BOT_TOKEN!);
 
+  await app.bot.api.setMyCommands([
+    { command: "start", description: "Запустить бота" },
+    { command: "elama", description: "Загрузить файл eLama" },
+    { command: "dailyreport", description: "Отчёт по дням" },
+    { command: "massmessage", description: "Массовая рассылка" },
+    { command: "reset", description: "Сбросить состояние" },
+  ]);
+
   app.bot.command("start", handleStart);
   app.bot.command("elama", handleElama.bind(null, app));
   app.bot.command("reset", handleReset.bind(null, app));
@@ -25,12 +33,12 @@ async function main() {
     }
 
     // Default fallback
-    await ctx.reply("Я вас не понял. Введите команду или начните с /start");
+    await ctx.reply("Я вас не понял. Введите / чтобы увидеть список команд");
   });
 
-  await app.bot.start();
-
   app.logger.log("🤖 Internal Бот запущен");
+
+  await app.bot.start();
 }
 
 main();

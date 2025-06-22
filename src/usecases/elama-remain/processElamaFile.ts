@@ -7,6 +7,7 @@ import { getSuccessMessage } from './getSuccessMessage';
 export async function processElamaFile({ logger, sheets, telegramService }: AppContext, ctx: Context) {
   const document = ctx.message?.document;
   if (!document) {
+    await ctx.reply("Ожидается HTML-файл. Пожалуйста, отправьте его.");
     return;
   }
 

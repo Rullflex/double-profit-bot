@@ -4,12 +4,14 @@ import { type AppContext } from '@/core/appContext';
 import { parseElamaRemains } from './parseElamaRemains';
 import { getSuccessMessage } from './getSuccessMessage';
 
-export async function processElamaFile({ logger, sheets, telegramService }: AppContext, ctx: Context) {
+export async function processElamaFile({ sheets, telegramService, steps }: AppContext, ctx: Context) {
   const document = ctx.message?.document;
   if (!document) {
     await ctx.reply("Ожидается HTML-файл. Пожалуйста, отправьте его.");
     return;
   }
+
+  ctx.from && steps.delete(ctx.from.id);
 
   const fileId = document.file_id;
   const buffer = await telegramService.getFile(fileId);
@@ -29,12 +31,7 @@ export async function processElamaFile({ logger, sheets, telegramService }: AppC
 
   await updateCommonMoneyRemain(sheets, currentRemains);
 
-  if (!ctx.chat) {
-    logger.withPrefix('processElamaFile').error("Chat ID not found in context");
-    return;
-  }
-
-  await telegramService.sendMessageWithRetry(
+  ctx.chat && await telegramService.sendMessageWithRetry(
     ctx.chat.id,
     getSuccessMessage(updatedCount),
   );

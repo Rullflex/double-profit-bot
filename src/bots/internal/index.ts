@@ -1,6 +1,7 @@
 import { createAppContext } from "@/core/appContext";
 import dotenv from "dotenv";
 import { handleElama, handleReset, handleStart } from "@/handlers/command";
+import { massMessageEntrypoint } from "@/usecases/mass-message/massMessageEntrypoint";
 
 dotenv.config();
 
@@ -17,13 +18,12 @@ async function main() {
 
   app.bot.command("start", handleStart);
   app.bot.command("elama", handleElama.bind(null, app));
+  app.bot.command("massmessage", massMessageEntrypoint.bind(null, app));
   app.bot.command("reset", handleReset.bind(null, app));
 
-  app.bot.on("message", async (ctx) => {
+  app.bot.on(["message:text", "callback_query:data"], async (ctx) => {
     const userId = ctx.from?.id;
     if (!userId) return;
-
-    // TODO еще callback_query
 
     const step = app.steps.get(userId);
 

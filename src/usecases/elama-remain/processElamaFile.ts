@@ -11,7 +11,7 @@ export async function processElamaFile({ sheets, telegramService, steps }: AppCo
     return;
   }
 
-  ctx.from && steps.delete(ctx.from.id);
+  steps.delete(ctx.from.id);
 
   const fileId = document.file_id;
   const buffer = await telegramService.getFile(fileId);
@@ -31,7 +31,7 @@ export async function processElamaFile({ sheets, telegramService, steps }: AppCo
 
   await updateCommonMoneyRemain(sheets, currentRemains);
 
-  ctx.chat && await telegramService.sendMessageWithRetry(
+  await telegramService.sendMessageWithRetry(
     ctx.chat.id,
     getSuccessMessage(updatedCount),
   );

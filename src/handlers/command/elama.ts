@@ -9,5 +9,5 @@ Safari — «Сохранить как... → Веб-архив»`;
 
 export async function handleElama(app: AppContext, ctx: CommandContext<Context>) {
   await app.telegramService.sendMessageWithRetry(ctx.chat.id, askUploadFile);
-  ctx.from?.id && app.steps.set(ctx.from.id, processElamaFile);
+  app.steps.set(ctx.from.id, processElamaFile);
 }

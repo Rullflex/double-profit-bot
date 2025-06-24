@@ -5,7 +5,7 @@ import { handleElama, handleReset, handleStart } from "@/handlers/command";
 dotenv.config();
 
 async function main() {
-  const app = await createAppContext(process.env.INTERNAL_BOT_TOKEN!);
+  const app = await createAppContext(process.env.INTERNAL_BOT_TOKEN);
 
   await app.bot.api.setMyCommands([
     { command: "start", description: "Запустить бота" },

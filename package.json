@@ -4,7 +4,6 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsx src/index.ts",
     "start:internal": "tsx src/bots/internal/index.ts",
     "start:external": "tsx src/bots/external/index.ts",
     "build": "tsc"

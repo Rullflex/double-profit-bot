@@ -5,18 +5,20 @@ import fetch from "node-fetch";
 
 export class TelegramService {
   private logger = new LoggerService("TelegramService");
+  private  maxAttempts = 6;
+  private  defaultDelay = 15000;
 
-  constructor(private readonly api: Api) {}
+  constructor(private readonly api: Api, options?: { maxAttempts?: number; defaultDelay?: number }) {
+    // настройки для функции sendMessageWithRetry, пока так
+    this.maxAttempts = options?.maxAttempts || this.maxAttempts;
+    this.defaultDelay = options?.defaultDelay || this.defaultDelay;
+  }
 
-  async sendMessageWithRetry(
-    chatId: number | string,
-    text: string,
-    maxAttempts = 6,
-    defaultDelay = 15000
-  ): Promise<void> {
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+  async sendMessageWithRetry(...args: Parameters<Api["sendMessage"]>): Promise<void> {
+    const [chatId, text] = args;
+    for (let attempt = 0; attempt < this.maxAttempts; attempt++) {
       try {
-        await this.api.sendMessage(chatId, text);
+        await this.api.sendMessage(...args);
         this.logger.debug(`Message <${text}> sent successfully to <${chatId}>`);
         return;
       } catch (err: any) {
@@ -24,33 +26,17 @@ export class TelegramService {
 
         if (err?.description?.includes("Too Many Requests: retry after")) {
           const match = err.description.match(/retry after (\d+)/i);
-          const retryAfter = match ? parseInt(match[1], 10) * 1000 : defaultDelay;
+          const retryAfter = match ? parseInt(match[1], 10) * 1000 : this.defaultDelay;
           this.logger.warn(`Rate limited. Retrying after ${retryAfter}ms`);
           await sleep(retryAfter);
         } else {
-          await sleep(defaultDelay);
+          await sleep(this.defaultDelay);
         }
       }
     }
 
-    this.logger.error(`Failed to send message to ${chatId} after ${maxAttempts} attempts`);
+    this.logger.error(`Failed to send message to ${chatId} after ${this.maxAttempts} attempts`);
     throw new Error("Failed to send message after retries.");
-  }
-
-  extractChatID(rawChatData: string): number {
-    const prefix = "ID:";
-    const index = rawChatData.lastIndexOf(prefix);
-    if (index !== -1 && index + prefix.length < rawChatData.length) {
-      const idStr = rawChatData.slice(index + prefix.length).trim();
-      const id = parseInt(idStr, 10);
-      if (isNaN(id)) {
-        this.logger.error("Invalid chat ID format:", idStr);
-        throw new Error("Invalid chat ID format");
-      }
-      return id;
-    }
-    this.logger.error("Chat ID not found in raw string:", rawChatData);
-    throw new Error("Chat ID not found in string");
   }
 
   async getFile(fileId: string): Promise<Buffer> {

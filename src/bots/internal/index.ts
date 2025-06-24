@@ -32,7 +32,6 @@ async function main() {
       return;
     }
 
-    // Default fallback
     await ctx.reply("Я вас не понял. Введите / чтобы увидеть список команд");
   });
 

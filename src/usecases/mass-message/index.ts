@@ -1,0 +1,1 @@
+export { massMessageEntrypoint } from './massMessageEntrypoint';

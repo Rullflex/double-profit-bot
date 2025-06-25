@@ -13,7 +13,7 @@ const MONEY_REMAIN_RANGE = `Остатки!C${MONEY_REMAIN_FIRST_ROW}:G`;
 const ELAMA_REMAIN_RANGE = `Остатки!G${MONEY_REMAIN_FIRST_ROW}:G`;
 const UPDATE_TIME_RANGE = "Остатки!G1:G1";
 
-export async function getCommonMoneyRemain(
+export async function getMoneyRemainData(
   sheets: sheets_v4.Sheets,
 ): Promise<MoneyRemainData[]> {
   const response = await sheets.spreadsheets.values.get({

@@ -1,7 +1,8 @@
 import { createAppContext } from "@/core/appContext";
 import dotenv from "dotenv";
 import { handleElama, handleReset, handleStart } from "@/handlers/command";
-import { massMessageEntrypoint } from "@/usecases/mass-message/massMessageEntrypoint";
+import { dailyReportEntrypoint } from "@/usecases/daily-report";
+import { massMessageEntrypoint } from "@/usecases/mass-message";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ async function main() {
 
   app.bot.command("start", handleStart);
   app.bot.command("elama", handleElama.bind(null, app));
+  app.bot.command("dailyreport", dailyReportEntrypoint.bind(null, app));
   app.bot.command("massmessage", massMessageEntrypoint.bind(null, app));
   app.bot.command("reset", handleReset.bind(null, app));
 

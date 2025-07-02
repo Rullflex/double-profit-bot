@@ -4,8 +4,8 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "start:internal": "tsx src/bots/internal/index.ts",
-    "start:external": "tsx src/bots/external/index.ts",
+    "start:internal": "tsx -r dotenv/config src/bots/internal/index.ts",
+    "start:external": "tsx -r dotenv/config src/bots/external/index.ts",
     "build": "tsc"
   },
   "author": "Dmitry Gorshkov",

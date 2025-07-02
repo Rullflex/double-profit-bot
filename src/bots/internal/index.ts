@@ -1,10 +1,7 @@
 import { createAppContext } from "@/core/appContext";
-import dotenv from "dotenv";
 import { handleElama, handleReset, handleStart } from "@/handlers/command";
 import { dailyReportEntrypoint } from "@/usecases/daily-report";
 import { massMessageEntrypoint } from "@/usecases/mass-message";
-
-dotenv.config();
 
 async function main() {
   const app = await createAppContext(process.env.INTERNAL_BOT_TOKEN);

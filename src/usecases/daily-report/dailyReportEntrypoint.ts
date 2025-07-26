@@ -1,6 +1,6 @@
 import { AppContext } from "@/core/appContext";
 import { getCustomerData, getMoneyRemainData } from "@/infrastructure/google-sheets";
-import { extractChatId } from "@/services/google-sheets-service";
+import { extractChatId } from "@/infrastructure/google-sheets";
 import { Context } from "grammy";
 
 const textInProgress = "Собираю нужные данные...";
@@ -11,7 +11,6 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
   const chatId = ctx.chat?.id;
   const userId = ctx.from?.id;
   if (!userId || !chatId) return;
-
 
   const statusInterval = setInterval(() => {
     app.telegramService.sendMessageWithRetry(chatId, textInProgress);

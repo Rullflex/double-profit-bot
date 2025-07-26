@@ -1,7 +1,7 @@
 import { AppContext } from "@/core/appContext";
 import { getChatList, getChatListByGroup } from "@/infrastructure/google-sheets";
-import { extractChatId } from "@/services/google-sheets-service";
-import { plural } from "@/shared/utils";
+import { extractChatId } from "@/infrastructure/google-sheets";
+import { REPLY_MESSAGE } from "@/shared/consts";
 import { Context } from "grammy";
 
 export async function sendMassMessage(rangeLetter: string, app: AppContext, ctx: Context) {
@@ -24,8 +24,7 @@ export async function sendMassMessage(rangeLetter: string, app: AppContext, ctx:
     })
   );
 
-  const reply = `Сообщение успешно отправлено в ${successCount} ${plural(successCount, ['чат', 'чата', 'чатов'])}`;
-  await ctx.reply(reply);
+  await ctx.reply(REPLY_MESSAGE.MASS_MESSAGE_SEND_SUCCESS(successCount));
 
   app.steps.delete(ctx.from.id);
 }

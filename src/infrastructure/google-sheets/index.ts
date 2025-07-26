@@ -1,3 +1,4 @@
+export * from "./extractChatId";
 export * from "./getChatGroupList";
 export * from "./getChatList";
 export * from "./getMoneyRemainData";

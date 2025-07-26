@@ -1,6 +1,7 @@
 import { AppContext } from "@/core/appContext";
 import { getChatGroupList } from "@/infrastructure/google-sheets";
 import { Context, InlineKeyboard } from "grammy";
+import { REPLY_MESSAGE } from "@/shared/consts";
 import { askMessageToSend } from "./askMessageToSend";
 
 export async function massMessageEntrypoint(app: AppContext, ctx: Context) {
@@ -14,9 +15,7 @@ export async function massMessageEntrypoint(app: AppContext, ctx: Context) {
     keyboard.text(title, letter).row();
   });
 
-  await app.telegramService.sendMessageWithRetry(ctx.chat.id, "Выбери группу чатов для рассылки:", {
-    reply_markup: keyboard,
-  });
-
+  await ctx.reply(REPLY_MESSAGE.MASS_MESSAGE_SELECT_GROUP, { reply_markup: keyboard });
+  
   app.steps.set(ctx.from.id, askMessageToSend);
 }

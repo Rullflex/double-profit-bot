@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import { AppContext } from "@/core/appContext";
 import { DDsData, getCustomerData, getDDSData } from "@/infrastructure/google-sheets";
-import { extractChatId } from "@/services/google-sheets-service";
+import { extractChatId } from "@/infrastructure/google-sheets";
 
 export interface DdsNotificator {
   readJsonData(ctx: AppContext["ctx"]): Promise<void>;

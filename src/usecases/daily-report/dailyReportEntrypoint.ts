@@ -1,11 +1,8 @@
 import { AppContext } from "@/core/appContext";
 import { getCustomerData, getMoneyRemainData } from "@/infrastructure/google-sheets";
 import { extractChatId } from "@/infrastructure/google-sheets";
+import { REPLY_MESSAGE } from "@/shared/consts";
 import { Context } from "grammy";
-
-const textInProgress = "Собираю нужные данные...";
-const textOK = "Отчеты успешно отправлены ✅";
-const textFail = "Не во все чаты удалось отправить отчеты 😞";
 
 export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
   const chatId = ctx.chat?.id;
@@ -13,7 +10,7 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
   if (!userId || !chatId) return;
 
   const statusInterval = setInterval(() => {
-    app.telegramService.sendMessageWithRetry(chatId, textInProgress);
+    ctx.reply(REPLY_MESSAGE.DAILY_REPORT_IN_PROGRESS);
   }, 18000);
 
   try {
@@ -30,9 +27,9 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       const remain = remainMap.get(customer.title);
       if (!remain) continue;
 
-      let chatID: number;
+      let customerChatId: number;
       try {
-        chatID = extractChatId(customer.telegramChatRaw);
+        customerChatId = extractChatId(customer.telegramChatRaw);
       } catch (err) {
         app.logger.error("ExtractChatID", { err, fn: "dailyReportEntrypoint" });
         continue;
@@ -42,7 +39,7 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       const message = buildMessage(customer.title, remain.ipRemain, remain.elamaRemain, needWarning);
 
       tasks.push(
-        app.telegramService.sendMessageWithRetry(chatID, message)
+        app.telegramService.sendMessageWithRetry(customerChatId, message)
           .then(() => { successCount++; })
           .catch(err => {
             app.logger.error("SendMessage", { err, fn: "dailyReportEntrypoint" });
@@ -56,8 +53,8 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
     await Promise.race([Promise.all(tasks), timeout]);
     timeoutId ?? clearTimeout(timeoutId);
 
-    const finalMessage = successCount < tasks.length ? textFail : textOK;
-    await app.telegramService.sendMessageWithRetry(chatId, finalMessage);
+    const finalMessage = successCount < tasks.length ? REPLY_MESSAGE.DAILY_REPORT_FAIL : REPLY_MESSAGE.DAILY_REPORT_SUCCESS;
+    await ctx.reply(finalMessage);
   } catch (err) {
     app.logger.error("Daily report failed", { err });
   } finally {

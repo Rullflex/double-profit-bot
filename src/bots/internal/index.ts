@@ -1,40 +1,29 @@
 import { createAppContext } from "@/core/appContext";
 import { handleElama, handleReset, handleStart } from "@/handlers/command";
+import { handleStepIfExists } from "@/handlers/message";
 import { dailyReportEntrypoint } from "@/usecases/daily-report";
 import { massMessageEntrypoint } from "@/usecases/mass-message";
+import { internalCommandList, InternalCommand } from "./const";
+import { REPLY_MESSAGE } from "@/shared/consts";
 
 async function main() {
   const app = await createAppContext(process.env.INTERNAL_BOT_TOKEN);
 
-  await app.bot.api.setMyCommands([
-    { command: "start", description: "Запустить бота" },
-    { command: "elama", description: "Загрузить файл eLama" },
-    { command: "dailyreport", description: "Отчёт по дням" },
-    { command: "massmessage", description: "Массовая рассылка" },
-    { command: "reset", description: "Сбросить состояние" },
-  ]);
+  await app.bot.api.setMyCommands(internalCommandList);
 
-  app.bot.command("start", handleStart);
-  app.bot.command("elama", handleElama.bind(null, app));
-  app.bot.command("dailyreport", dailyReportEntrypoint.bind(null, app));
-  app.bot.command("massmessage", massMessageEntrypoint.bind(null, app));
-  app.bot.command("reset", handleReset.bind(null, app));
+  app.bot.command(InternalCommand.START, handleStart);
+  app.bot.command(InternalCommand.ELAMA, handleElama.bind(null, app));
+  app.bot.command(InternalCommand.DAILYREPORT, dailyReportEntrypoint.bind(null, app));
+  app.bot.command(InternalCommand.MASSMESSAGE, massMessageEntrypoint.bind(null, app));
+  app.bot.command(InternalCommand.RESET, handleReset.bind(null, app));
 
-  app.bot.on(["message:text", "callback_query:data"], async (ctx) => {
-    const userId = ctx.from?.id;
-    if (!userId) return;
+  app.bot.on(["message", "callback_query:data"], async (ctx) => {
+    const handled = await handleStepIfExists(ctx, app);
 
-    const step = app.steps.get(userId);
-
-    if (step) {
-      await step(app, ctx);
-      return;
+    if (!handled) {
+      await ctx.reply(REPLY_MESSAGE.UNKNOWN_COMMAND);
     }
-
-    await ctx.reply("Я вас не понял. Введите / чтобы увидеть список команд");
   });
-
-  app.logger.log("🤖 Internal Бот запущен");
 
   await app.bot.start();
 }

@@ -2,22 +2,20 @@ import { type Context } from 'grammy';
 import { getMoneyRemainData, updateCommonMoneyRemain } from '@/infrastructure/google-sheets';
 import { type AppContext } from '@/core/appContext';
 import { parseElamaRemains } from './parseElamaRemains';
-import { getSuccessMessage } from './getSuccessMessage';
+import { REPLY_MESSAGE } from '@/shared/consts';
 
 export async function processElamaFile({ sheets, telegramService, steps }: AppContext, ctx: Context) {
   const document = ctx.message?.document;
   if (!document) {
-    await ctx.reply("Ожидается HTML-файл. Пожалуйста, отправьте его.");
+    await ctx.reply(REPLY_MESSAGE.ELAMA_INVALID_FILE);
     return;
   }
-
-  steps.delete(ctx.from.id);
 
   const fileId = document.file_id;
   const buffer = await telegramService.getFile(fileId);
   const parsedElamaRemains = parseElamaRemains(buffer);
 
-  const currentRemains = await getMoneyRemainData(sheets);
+  const currentRemains = await getMoneyRemainData(sheets); // TODO - catch error
 
   let updatedCount = 0;
 
@@ -29,10 +27,8 @@ export async function processElamaFile({ sheets, telegramService, steps }: AppCo
     }
   }
 
-  await updateCommonMoneyRemain(sheets, currentRemains);
+  await updateCommonMoneyRemain(sheets, currentRemains);  // TODO - catch error
 
-  await telegramService.sendMessageWithRetry(
-    ctx.chat.id,
-    getSuccessMessage(updatedCount),
-  );
+  await ctx.reply(REPLY_MESSAGE.ELAMA_SUCCESS_UPDATE(updatedCount));
+  steps.delete(ctx.from.id);
 }

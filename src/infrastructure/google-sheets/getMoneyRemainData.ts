@@ -22,12 +22,13 @@ export async function getMoneyRemainData(
     valueRenderOption: "UNFORMATTED_VALUE",
   });
 
-  const rows = response.data.values ?? [];
+  let rows = response.data.values ?? [];
+  rows = rows.filter((row) => row.length > 0);
   const result: MoneyRemainData[] = [];
 
   for (const row of rows) {
     if (row.length < 4) {
-      throw new Error(`Bad row length: ${JSON.stringify(row)}`);
+      throw new Error(`Bad row length (не все ячейки заполнены): ${JSON.stringify(row)}`);
     }
 
     const title = typeof row[0] === "string" ? row[0] : "";

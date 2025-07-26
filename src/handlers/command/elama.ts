@@ -1,13 +1,9 @@
 import { CommandContext, Context } from 'grammy';
 import { AppContext } from '@/core/appContext';
 import { processElamaFile } from '@/usecases/elama-remain';
-
-const askUploadFile = `Отправь файл с главной страницы eLama со списком всех клиентов
-Не забудь внизу страницы поставить максимальное количество строк.
-Chrome — «Сохранить как... → Веб-страница полностью»
-Safari — «Сохранить как... → Веб-архив»`;
+import { REPLY_MESSAGE } from '@/shared/consts';
 
 export async function handleElama(app: AppContext, ctx: CommandContext<Context>) {
-  await app.telegramService.sendMessageWithRetry(ctx.chat.id, askUploadFile);
+  await ctx.reply(REPLY_MESSAGE.ELAMA_COMMAND);
   app.steps.set(ctx.from.id, processElamaFile);
 }

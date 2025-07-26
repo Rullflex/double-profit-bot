@@ -12,7 +12,7 @@ export interface AppContext {
   bot: Bot;
   logger: LoggerService;
   sheets: sheets_v4.Sheets;
-  steps: Map<number, Function>;
+  steps: Map<number, (app: AppContext, ctx: Context) => Promise<void>>;
   telegramService: TelegramService;
   ctx: ExecutionContext;
 }
@@ -22,7 +22,7 @@ export async function createAppContext(botToken: string): Promise<AppContext> {
   const logger = new LoggerService();
   const sheets = await getSheetsClient();
   const telegramService = new TelegramService(bot.api);
-  const steps = new Map<number, (app: AppContext, ctx: Context) => Promise<void>>();
+  const steps: AppContext['steps'] = new Map();
   const abortController = new AbortController();
 
   return {

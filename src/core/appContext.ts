@@ -21,7 +21,7 @@ export interface AppContext {
 export async function createAppContext(): Promise<AppContext> {
   const internalBot = new Bot(process.env.INTERNAL_BOT_TOKEN);
   const externalBot = new Bot(process.env.EXTERNAL_BOT_TOKEN);
-  const logger = createLogger({ bot: internalBot });
+  const logger = createLogger({ bot: externalBot });
   const sheets = await getSheetsClient();
   const steps: AppContext['steps'] = new Map();
   const abortController = new AbortController();

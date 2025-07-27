@@ -6,7 +6,8 @@
   "scripts": {
     "start:internal": "tsx -r dotenv/config src/bots/internal/index.ts",
     "start:external": "tsx -r dotenv/config src/bots/external/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest"
   },
   "author": "Dmitry Gorshkov",
   "license": "ISC",
@@ -20,6 +21,7 @@
   "devDependencies": {
     "@types/node": "^22.15.18",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   }
 }

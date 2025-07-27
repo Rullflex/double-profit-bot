@@ -11,3 +11,17 @@ export async function getSheetsClient(): Promise<sheets_v4.Sheets> {
 
   return cachedSheetsClient;
 }
+
+/**
+ * Extracts a Google Sheets document ID from a Google Sheets URL.
+ *
+ * Given a URL like https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit#gid=0,
+ * this function returns the value of SPREADSHEET_ID.
+ *
+ * If the URL does not contain a valid Google Sheets document ID, this function
+ * returns an empty string.
+ */
+export function extractSheetIdFromGLink(link: string): string {
+  const match = /\/d\/([^/]+)/.exec(link);
+  return match?.[1] || "";
+}

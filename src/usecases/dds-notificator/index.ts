@@ -5,6 +5,7 @@ import path from "path";
 import { AppContext } from "@/core/appContext";
 import { DDsData, getCustomerData, getDDSData } from "@/infrastructure/google-sheets";
 import { extractChatId } from "@/infrastructure/google-sheets";
+import { extractSheetIdFromGLink } from "@/services/google-sheets-service";
 
 export interface DdsNotificator {
   readJsonData(ctx: AppContext["ctx"]): Promise<void>;
@@ -50,7 +51,7 @@ export function createDdsNotificatorUsecase(app: AppContext): DdsNotificator {
             for (const customer of customers) {
               await new Promise(r => setTimeout(r, delay));
 
-              const sheetId = extractSheetID(customer.gLink);
+              const sheetId = extractSheetIdFromGLink(customer.gLink);
               let lastCheckedRow = rowMap[sheetId] || 8;
 
               const { currentChanges: changes, currentRemain: lastRemain } = await getDDSData(
@@ -95,11 +96,6 @@ export function createDdsNotificatorUsecase(app: AppContext): DdsNotificator {
       run();
     },
   };
-}
-
-function extractSheetID(link: string): string {
-  const match = /\/d\/([^/]+)/.exec(link);
-  return match?.[1] || "";
 }
 
 function formatMessage(customer: string, dds: DDsData, remain: number): string {

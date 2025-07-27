@@ -1,10 +1,7 @@
 import { createAppContext } from "@/core/appContext";
 import { handleAddToChat, handleChangeChatId, handleChangeChatTitle, handleRemoveFromChat } from "@/handlers/command";
 import { createDdsNotificatorUsecase } from "@/usecases/dds-notificator";
-import dotenv from "dotenv";
 import process from "node:process";
-
-dotenv.config();
 
 async function main() {
   const app = await createAppContext(process.env.EXTERNAL_BOT_TOKEN!);
@@ -29,8 +26,6 @@ async function main() {
     allowed_updates: ["message"],
     drop_pending_updates: true,
   });
-
-  app.logger.log("🤖 External Бот запущен");
 
   // Грейсфул шутдаун
   const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];

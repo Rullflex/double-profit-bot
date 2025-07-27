@@ -1,11 +1,7 @@
 import { AppContext } from "@/core/appContext";
 import { getChatList, updateChatList } from "@/infrastructure/google-sheets";
+import { REPLY_MESSAGE } from "@/shared/consts";
 import { Context } from "grammy";
-
-const helloString = `
-Всем привет!
-Контакт установлен
-👉👈`;
 
 export async function handleAddToChat(app: AppContext, ctx: Context) {
   const newMembers = ctx.message?.new_chat_members;
@@ -19,7 +15,7 @@ export async function handleAddToChat(app: AppContext, ctx: Context) {
     chatList.push(newEntry);
 
     await updateChatList(app.sheets, chatList);
-    await app.telegramService.sendMessageWithRetry(ctx.chat.id, helloString);
+    await ctx.reply(REPLY_MESSAGE.ADD_TO_CHAT_SUCCESS);
   } catch (err) {
     app.logger.error("handleAddToChat", { err });
   }

@@ -12,6 +12,11 @@ export async function handleRemoveFromChat(app: AppContext, ctx: Context) {
     const chatList = await getChatList(app.sheets);
     const filteredList = chatList.filter(item => !item.includes(String(chatId)));
 
+    // Добавляем пустые строки, чтобы затереть старые данные в Google Sheets
+    while (filteredList.length < chatList.length) {
+      filteredList.push("");
+    }
+
     await updateChatList(app.sheets, filteredList);
   } catch (err) {
     app.logger.error("handleRemoveFromChat", { err });

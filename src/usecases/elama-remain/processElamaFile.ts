@@ -13,10 +13,10 @@ export async function processElamaFile({ sheets, steps }: AppContext, ctx: Conte
   }
 
   const fileId = document.file_id;
-  const buffer = await getFileBuffer(ctx.api, fileId); // TODO - catch error
+  const buffer = await getFileBuffer(ctx.api, fileId);
   const parsedElamaRemains = parseElamaRemains(buffer);
 
-  const currentRemains = await getMoneyRemainData(sheets); // TODO - catch error
+  const currentRemains = await getMoneyRemainData(sheets);
 
   let updatedCount = 0;
 
@@ -28,7 +28,7 @@ export async function processElamaFile({ sheets, steps }: AppContext, ctx: Conte
     }
   }
 
-  await updateCommonMoneyRemain(sheets, currentRemains);  // TODO - catch error
+  await updateCommonMoneyRemain(sheets, currentRemains);
 
   await ctx.reply(REPLY_MESSAGE.ELAMA_SUCCESS_UPDATE(updatedCount));
   steps.delete(ctx.from.id);

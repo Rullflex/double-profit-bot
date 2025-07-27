@@ -5,9 +5,9 @@ import { REPLY_MESSAGE } from "@/shared/consts";
 
 export async function askMessageToSend(app: AppContext, ctx: Context) {
   const rangeLetter = ctx.callbackQuery?.data;
+
   if (!rangeLetter) {
-    app.logger.withPrefix("askMessageToSend").error("Не указан диапазон для рассылки");
-    return;
+    throw new Error("Не удалось получить букву диапазона");
   }
 
   // Удаляем сообщение с кнопками

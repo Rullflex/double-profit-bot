@@ -9,14 +9,10 @@ export async function handleAddToChat(app: AppContext, ctx: Context) {
 
   if (!isBotAdded) return;
 
-  try {
-    const chatList = await getChatList(app.sheets);
-    const newEntry = `${ctx.chat.title} ID:${ctx.chat.id}`;
-    chatList.push(newEntry);
+  const chatList = await getChatList(app.sheets);
+  const newEntry = `${ctx.chat.title} ID:${ctx.chat.id}`;
+  chatList.push(newEntry);
 
-    await updateChatList(app.sheets, chatList);
-    await ctx.reply(REPLY_MESSAGE.ADD_TO_CHAT_SUCCESS);
-  } catch (err) {
-    app.logger.error("handleAddToChat", { err });
-  }
+  await updateChatList(app.sheets, chatList);
+  await ctx.reply(REPLY_MESSAGE.ADD_TO_CHAT_SUCCESS);
 }

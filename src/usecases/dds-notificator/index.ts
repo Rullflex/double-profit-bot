@@ -21,14 +21,10 @@ export function createDdsNotificatorUsecase(app: AppContext): DdsNotificator {
 
   return {
     async readJsonData(ctx) {
-      try {
-        const content = await fs.readFile(filePath, "utf-8");
-        if (!content) return;
-        const parsed = JSON.parse(content);
-        Object.assign(rowMap, parsed);
-      } catch (err) {
-        app.logger.error("read file", { err, fn: "ddsNotificator:readJsonData" });
-      }
+      const content = await fs.readFile(filePath, "utf-8");
+      if (!content) return;
+      const parsed = JSON.parse(content);
+      Object.assign(rowMap, parsed);
     },
 
     start(ctx) {
@@ -36,58 +32,45 @@ export function createDdsNotificatorUsecase(app: AppContext): DdsNotificator {
       const configInterval = 60_000; // Can be read from .env or app.config
 
       async function writeJsonData() {
-        try {
-          await fs.writeFile(filePath, JSON.stringify(rowMap), { mode: 0o700 });
-        } catch (err) {
-          app.logger.error("write file", { err, fn: "ddsNotificator:writeJsonData" });
-        }
+        await fs.writeFile(filePath, JSON.stringify(rowMap), { mode: 0o700 });
       }
 
       async function run() {
         while (!ctx.signal.aborted) {
-          try {
-            const customers = await getCustomerData(app.sheets);
-            const delay = configInterval / (customers.length + 1);
+          const customers = await getCustomerData(app.sheets);
+          const delay = configInterval / (customers.length + 1);
 
-            for (const customer of customers) {
-              await new Promise(r => setTimeout(r, delay));
+          for (const customer of customers) {
+            await new Promise(r => setTimeout(r, delay));
 
-              const sheetId = extractSheetIdFromGLink(customer.gLink);
-              let lastCheckedRow = rowMap[sheetId] || 8;
+            const sheetId = extractSheetIdFromGLink(customer.gLink);
+            let lastCheckedRow = rowMap[sheetId] || 8;
 
-              const { currentChanges: changes, currentRemain: lastRemain } = await getDDSData(
-                app.sheets,
-                sheetId,
-                `ДДС!A${lastCheckedRow}:G`
-              );
+            const { currentChanges: changes, currentRemain: lastRemain } = await getDDSData(
+              app.sheets,
+              sheetId,
+              `ДДС!A${lastCheckedRow}:G`
+            );
 
-              if (!changes.length) continue;
+            if (!changes.length) continue;
 
-              const chatId = extractChatId(customer.telegramChatRaw);
-              const messages: string[] = [];
+            const chatId = extractChatId(customer.telegramChatRaw);
+            const messages: string[] = [];
 
-              let remain = lastRemain;
-              for (let i = changes.length - 1; i >= 0; i--) {
-                const msg = formatMessage(customer.title, changes[i], remain);
-                messages.push(msg);
-                remain -= changes[i].money;
-              }
-
-              for (const msg of messages) {
-                try {
-                  await sendMessageWithRetry(app.externalBot.api, chatId, msg);
-                  lastCheckedRow++;
-                } catch (err) {
-                  app.logger.error("send DDS notification to chat", { err, fn: "ddsNotificator:Do" });
-                  break;
-                }
-              }
-
-              rowMap[sheetId] = lastCheckedRow;
-              await writeJsonData();
+            let remain = lastRemain;
+            for (let i = changes.length - 1; i >= 0; i--) {
+              const msg = formatMessage(customer.title, changes[i], remain);
+              messages.push(msg);
+              remain -= changes[i].money;
             }
-          } catch (err) {
-            app.logger.error("ddsNotificator run loop", { err });
+
+            for (const msg of messages) {
+              await sendMessageWithRetry(app.externalBot.api, chatId, msg);
+              lastCheckedRow++;
+            }
+
+            rowMap[sheetId] = lastCheckedRow;
+            await writeJsonData();
           }
 
           await new Promise(r => setTimeout(r, interval));

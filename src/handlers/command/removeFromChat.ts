@@ -8,17 +8,13 @@ export async function handleRemoveFromChat(app: AppContext, ctx: Context) {
 
   if (!left?.is_bot || left.id !== ctx.me.id || !chatId) return;
 
-  try {
-    const chatList = await getChatList(app.sheets);
-    const filteredList = chatList.filter(item => !item.includes(String(chatId)));
+  const chatList = await getChatList(app.sheets);
+  const filteredList = chatList.filter(item => !item.includes(String(chatId)));
 
-    // Добавляем пустые строки, чтобы затереть старые данные в Google Sheets
-    while (filteredList.length < chatList.length) {
-      filteredList.push("");
-    }
-
-    await updateChatList(app.sheets, filteredList);
-  } catch (err) {
-    app.logger.error("handleRemoveFromChat", { err });
+  // Добавляем пустые строки, чтобы затереть старые данные в Google Sheets
+  while (filteredList.length < chatList.length) {
+    filteredList.push("");
   }
+
+  await updateChatList(app.sheets, filteredList);
 }

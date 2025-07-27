@@ -8,14 +8,10 @@ export async function handleChangeChatTitle(app: AppContext, ctx: Context) {
 
   if (!chatId || !newTitle) return;
 
-  try {
-    const chatList = await getChatList(app.sheets);
-    const updatedList = chatList.map(item =>
-      item.includes(String(chatId)) ? `${newTitle} ID:${chatId}` : item
-    );
+  const chatList = await getChatList(app.sheets);
+  const updatedList = chatList.map(item =>
+    item.includes(String(chatId)) ? `${newTitle} ID:${chatId}` : item
+  );
 
-    await updateChatList(app.sheets, updatedList);
-  } catch (err) {
-    app.logger.error("handleChangeChatTitle", { err });
-  }
+  await updateChatList(app.sheets, updatedList);
 }

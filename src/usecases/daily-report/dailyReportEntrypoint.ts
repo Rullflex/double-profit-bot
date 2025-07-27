@@ -28,23 +28,12 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       const remain = remainMap.get(customer.title);
       if (!remain) continue;
 
-      let customerChatId: number;
-      try {
-        customerChatId = extractChatId(customer.telegramChatRaw);
-      } catch (err) {
-        app.logger.error("ExtractChatID", { err, fn: "dailyReportEntrypoint" });
-        continue;
-      }
-
+      const customerChatId = extractChatId(customer.telegramChatRaw);;
       const needWarning = remain.ipRemain < customer.thresholdBalance;
       const message = buildMessage(customer.title, remain.ipRemain, remain.elamaRemain, needWarning);
 
       tasks.push(
-        sendMessageWithRetry(app.externalBot.api, customerChatId, message)
-          .then(() => { successCount++; })
-          .catch(err => {
-            app.logger.error("SendMessage", { err, fn: "dailyReportEntrypoint" });
-          })
+        sendMessageWithRetry(app.externalBot.api, customerChatId, message).then(() => { successCount++; })
       );
     }
 
@@ -56,8 +45,6 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
 
     const finalMessage = successCount < tasks.length ? REPLY_MESSAGE.DAILY_REPORT_FAIL : REPLY_MESSAGE.DAILY_REPORT_SUCCESS;
     await ctx.reply(finalMessage);
-  } catch (err) {
-    app.logger.error("Daily report failed", { err });
   } finally {
     clearInterval(statusInterval);
   }

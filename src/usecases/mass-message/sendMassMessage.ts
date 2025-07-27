@@ -15,13 +15,9 @@ export async function sendMassMessage(rangeLetter: string, app: AppContext, ctx:
   let successCount = 0;
   await Promise.all(
     chatList.map(async (chatRaw) => {
-      try {
-        const chatId = extractChatId(chatRaw);
-        await sendMessageWithRetry(app.externalBot.api, chatId, ctx.message.text);
-        successCount++;
-      } catch (err) {
-        app.logger.error("Ошибка отправки", { err, chatRaw });
-      }
+      const chatId = extractChatId(chatRaw);
+      await sendMessageWithRetry(app.externalBot.api, chatId, ctx.message.text);
+      successCount++;
     })
   );
 

@@ -25,6 +25,8 @@ async function main() {
     }
   });
 
+  app.internalBot.catch((err) => app.logger.error("Internal Bot error:", err));
+
   await app.internalBot.start({
     drop_pending_updates: true,
   });

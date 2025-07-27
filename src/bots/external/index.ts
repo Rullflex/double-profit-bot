@@ -19,6 +19,8 @@ async function main() {
     }
   });
 
+  app.externalBot.catch((err) => app.logger.error("External Bot error:", err));
+
   await app.externalBot.start({
     allowed_updates: ["message"],
     drop_pending_updates: true,
@@ -28,7 +30,6 @@ async function main() {
   const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];
   for (const sig of signals) {
     process.once(sig, () => {
-      app.logger.log(`🚦 Signal received: ${sig}`);
       app.ctx.cancel();
     });
   }

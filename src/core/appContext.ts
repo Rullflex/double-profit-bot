@@ -1,6 +1,6 @@
 import { Bot, Context } from 'grammy';
 import { sheets_v4 } from 'googleapis';
-import { TelegramService, LoggerService } from '@/services';
+import { LoggerService } from '@/services';
 import { getSheetsClient } from '@/services/google-sheets-service';
 
 export interface ExecutionContext {
@@ -9,28 +9,28 @@ export interface ExecutionContext {
 }
 
 export interface AppContext {
-  bot: Bot;
+  internalBot: Bot;
+  externalBot: Bot;
   logger: LoggerService;
   sheets: sheets_v4.Sheets;
   steps: Map<number, (app: AppContext, ctx: Context) => Promise<void>>;
-  telegramService: TelegramService;
   ctx: ExecutionContext;
 }
 
-export async function createAppContext(botToken: string): Promise<AppContext> {
-  const bot = new Bot(botToken);
+export async function createAppContext(): Promise<AppContext> {
+  const internalBot = new Bot(process.env.INTERNAL_BOT_TOKEN);
+  const externalBot = new Bot(process.env.EXTERNAL_BOT_TOKEN);
   const logger = new LoggerService();
   const sheets = await getSheetsClient();
-  const telegramService = new TelegramService(bot.api);
   const steps: AppContext['steps'] = new Map();
   const abortController = new AbortController();
 
   return {
-    bot,
+    internalBot,
+    externalBot,
     logger,
     sheets,
     steps,
-    telegramService,
     ctx: {
       signal: abortController.signal,
       cancel: () => abortController.abort(),

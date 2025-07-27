@@ -2,6 +2,7 @@ import { AppContext } from "@/core/appContext";
 import { getCustomerData, getMoneyRemainData } from "@/infrastructure/google-sheets";
 import { extractChatId } from "@/infrastructure/google-sheets";
 import { REPLY_MESSAGE } from "@/shared/consts";
+import { sendMessageWithRetry } from "@/shared/utils";
 import { Context } from "grammy";
 
 export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
@@ -39,7 +40,7 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       const message = buildMessage(customer.title, remain.ipRemain, remain.elamaRemain, needWarning);
 
       tasks.push(
-        app.telegramService.sendMessageWithRetry(customerChatId, message)
+        sendMessageWithRetry(app.externalBot.api, customerChatId, message)
           .then(() => { successCount++; })
           .catch(err => {
             app.logger.error("SendMessage", { err, fn: "dailyReportEntrypoint" });

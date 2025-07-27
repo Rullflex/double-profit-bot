@@ -3,8 +3,9 @@ import { getMoneyRemainData, updateCommonMoneyRemain } from '@/infrastructure/go
 import { type AppContext } from '@/core/appContext';
 import { parseElamaRemains } from './parseElamaRemains';
 import { REPLY_MESSAGE } from '@/shared/consts';
+import { getFileBuffer } from '@/shared/utils';
 
-export async function processElamaFile({ sheets, telegramService, steps }: AppContext, ctx: Context) {
+export async function processElamaFile({ sheets, steps }: AppContext, ctx: Context) {
   const document = ctx.message?.document;
   if (!document) {
     await ctx.reply(REPLY_MESSAGE.ELAMA_INVALID_FILE);
@@ -12,7 +13,7 @@ export async function processElamaFile({ sheets, telegramService, steps }: AppCo
   }
 
   const fileId = document.file_id;
-  const buffer = await telegramService.getFile(fileId);
+  const buffer = await getFileBuffer(ctx.api, fileId); // TODO - catch error
   const parsedElamaRemains = parseElamaRemains(buffer);
 
   const currentRemains = await getMoneyRemainData(sheets); // TODO - catch error

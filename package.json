@@ -4,15 +4,16 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "start:internal": "tsx -r dotenv/config src/bots/internal/index.ts",
-    "start:external": "tsx -r dotenv/config src/bots/external/index.ts",
-    "build": "tsc",
+    "start:internal": "NODE_ENV=development tsx -r dotenv-flow/config src/bots/internal/index.ts",
+    "start:external": "NODE_ENV=development tsx -r dotenv-flow/config src/bots/external/index.ts",
+    "build:internal": "NODE_ENV=production tsc -r dotenv-flow/config src/bots/internal/index.ts",
+    "build:external": "NODE_ENV=production tsc -r dotenv-flow/config src/bots/external/index.ts",
     "test": "vitest"
   },
   "author": "Dmitry Gorshkov",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.5.0",
+    "dotenv-flow": "^4.1.0",
     "googleapis": "^148.0.0",
     "grammy": "^1.36.1",
     "node-fetch": "^3.3.2",

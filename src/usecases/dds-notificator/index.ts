@@ -65,7 +65,7 @@ export function createDdsNotificatorUsecase(app: AppContext): DdsNotificator {
             }
 
             for (const msg of messages) {
-              await sendMessageWithRetry(app.externalBot.api, chatId, msg);
+              await sendMessageWithRetry(app.notificationBotApi, chatId, msg);
               lastCheckedRow++;
             }
 

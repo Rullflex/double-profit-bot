@@ -33,7 +33,7 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       const message = buildMessage(customer.title, remain.ipRemain, remain.elamaRemain, needWarning);
 
       tasks.push(
-        sendMessageWithRetry(app.externalBot.api, customerChatId, message).then(() => { successCount++; })
+        sendMessageWithRetry(app.notificationBotApi, customerChatId, message).then(() => { successCount++; })
       );
     }
 

@@ -7,17 +7,20 @@ import { internalCommandList, InternalCommand } from "./const";
 import { REPLY_MESSAGE } from "@/shared/consts";
 
 async function main() {
-  const app = await createAppContext();
+  const app = await createAppContext({
+    botToken: process.env.INTERNAL_BOT_TOKEN,
+    loggerLabel: "internal",
+  });
 
-  await app.internalBot.api.setMyCommands(internalCommandList);
+  await app.bot.api.setMyCommands(internalCommandList);
 
-  app.internalBot.command(InternalCommand.START, handleStart);
-  app.internalBot.command(InternalCommand.ELAMA, handleElama.bind(null, app));
-  app.internalBot.command(InternalCommand.DAILYREPORT, dailyReportEntrypoint.bind(null, app));
-  app.internalBot.command(InternalCommand.MASSMESSAGE, massMessageEntrypoint.bind(null, app));
-  app.internalBot.command(InternalCommand.RESET, handleReset.bind(null, app));
+  app.bot.command(InternalCommand.START, handleStart);
+  app.bot.command(InternalCommand.ELAMA, handleElama.bind(null, app));
+  app.bot.command(InternalCommand.DAILYREPORT, dailyReportEntrypoint.bind(null, app));
+  app.bot.command(InternalCommand.MASSMESSAGE, massMessageEntrypoint.bind(null, app));
+  app.bot.command(InternalCommand.RESET, handleReset.bind(null, app));
 
-  app.internalBot.on(["message", "callback_query:data"], async (ctx) => {
+  app.bot.on(["message", "callback_query:data"], async (ctx) => {
     const handled = await handleStepIfExists(ctx, app);
 
     if (!handled) {
@@ -25,9 +28,9 @@ async function main() {
     }
   });
 
-  app.internalBot.catch((err) => app.logger.error("Internal Bot error:", err));
+  app.bot.catch(app.logger.error);
 
-  await app.internalBot.start({
+  await app.bot.start({
     drop_pending_updates: true,
   });
 }

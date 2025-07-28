@@ -1,8 +1,8 @@
 import winston from "winston";
 import { TelegramTransport } from "./telegram-transport";
-import { Bot } from "grammy";
+import { Api } from "grammy";
 
-export const createLogger = (options: { bot: Bot; label?: string }): winston.Logger => winston.createLogger({
+export const createLogger = (options: { botApi: Api; label?: string }): winston.Logger => winston.createLogger({
   level: "debug",
   format: winston.format.combine(
     winston.format.errors({ stack: true }),
@@ -20,10 +20,9 @@ export const createLogger = (options: { bot: Bot; label?: string }): winston.Log
     new winston.transports.File({ filename: "logs/combined.log" }),
     new TelegramTransport({
       level: "error",
-      bot: options.bot,
+      botApi: options.botApi,
       chatId: process.env.LOG_CHAT_ID,
     }),
   ],
 });
 
-export const logger = createLogger({ bot: new Bot(process.env.INTERNAL_BOT_TOKEN) });

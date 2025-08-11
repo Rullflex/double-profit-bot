@@ -11,8 +11,7 @@ const RUCAPTCHA_API_KEY = process.env.RUCAPTCHA_API_KEY!
 
 const logger = createLogger({ label: "parseElamaRemainsFromPage" });
 
-export async function parseElamaRemainsByBrowser() {
-  logger.debug("🔍 Запускаем puppeteer для парсинга остатков");
+export async function parseElamaRemainsByBrowser(logProgress: (message: string) => void = logger.info) {
   const browser = await puppeteer.launch({
     headless: true,
     executablePath: '/usr/bin/chromium-browser',
@@ -22,13 +21,14 @@ export async function parseElamaRemainsByBrowser() {
   const page = await browser.newPage();
   const solver = new Solver(RUCAPTCHA_API_KEY);
 
+  logProgress("Прохожу авторизацию на сайте Elama");
   await page.goto("https://account.elama.global/signin");
-
   await fillLoginForm(page, EMAIL, PASSWORD);
   const token = await solveCaptchaIfPresent(page, solver);
   await submitLoginToken(page, token, EMAIL, PASSWORD);
 
-  const result = await parseElamaRemainsFromPage(page);
+  logProgress("Начинаю процесс парсинга остатков клиентов Elama");
+  const result = await parseElamaRemainsFromPage(page, logProgress);
 
   await browser.close();
 
@@ -92,18 +92,13 @@ async function submitLoginToken(page: Page, token: string | null, email: string,
   await page.waitForNavigation({ timeout: 30000 });
 }
 
-async function parseElamaRemainsFromPage(page: Page): Promise<Record<number, ElamaCustomer>> {
-  logger.debug("🔍 Начинаем парсинг остатков Elama");
-
+async function parseElamaRemainsFromPage(page: Page, logProgress: (message: string) => void): Promise<Record<number, ElamaCustomer>> {
+  // TODO - и чтобы бот фильтр нужный выставлял
   const result: Record<number, ElamaCustomer> = {};
-
   const sectionHandle = await page.waitForSelector('[data-test="Agency_clientList"]', { timeout: 30000 });
-  logger.debug("🔍 Селектор Agency_clientList найден, начинаем парсинг");
 
   let pageIndex = 1;
   while (true) {
-    logger.debug(`📄 Парсим страницу ${pageIndex}`);
-
     const sectionHtml = await page.evaluate(
       (start) => {
         const range = document.createRange();
@@ -136,7 +131,7 @@ async function parseElamaRemainsFromPage(page: Page): Promise<Record<number, Ela
       result[elamaIds[i]] = { elamaId: elamaIds[i], remain: remains[i] };
     }
 
-    logger.debug(`✅ Страница ${pageIndex} обработана: ${len} записей`);
+    logProgress(`✅ Страница ${pageIndex} обработана: ${len} записей`);
 
     // Проверяем, можно ли перейти на следующую страницу
     const nextButton = await page.$('button[value="nextPage"]');
@@ -156,6 +151,6 @@ async function parseElamaRemainsFromPage(page: Page): Promise<Record<number, Ela
     pageIndex++;
   }
 
-  logger.debug(`🎯 Итог: собрано ${Object.keys(result).length} записей`);
+  logProgress(`🎯 Итог: собрано ${Object.keys(result).length} записей`);
   return result;
 }

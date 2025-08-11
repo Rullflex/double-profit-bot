@@ -1,10 +1,11 @@
 import { createAppContext } from "@/core/appContext";
-import { handleElama, handleReset, handleStart } from "@/handlers/command";
+import { handleElamaFile, handleReset, handleStart } from "@/handlers/command";
 import { handleStepIfExists } from "@/handlers/message";
 import { dailyReportEntrypoint } from "@/usecases/daily-report";
 import { massMessageEntrypoint } from "@/usecases/mass-message";
 import { internalCommandList, InternalCommand } from "./const";
 import { REPLY_MESSAGE } from "@/shared/consts";
+import { elamaAutoEntrypoint } from "@/usecases/elama-remain";
 
 async function main() {
   const app = await createAppContext({
@@ -15,7 +16,8 @@ async function main() {
   await app.bot.api.setMyCommands(internalCommandList);
 
   app.bot.command(InternalCommand.START, handleStart);
-  app.bot.command(InternalCommand.ELAMA, handleElama.bind(null, app));
+  app.bot.command(InternalCommand.ELAMA, elamaAutoEntrypoint.bind(null, app));
+  app.bot.command(InternalCommand.ELAMA_FILE, handleElamaFile.bind(null, app));
   app.bot.command(InternalCommand.DAILYREPORT, dailyReportEntrypoint.bind(null, app));
   app.bot.command(InternalCommand.MASSMESSAGE, massMessageEntrypoint.bind(null, app));
   app.bot.command(InternalCommand.RESET, handleReset.bind(null, app));
@@ -28,7 +30,7 @@ async function main() {
     }
   });
 
-  app.bot.catch(app.logger.error);
+  app.bot.catch((e) => app.logger.error(e));
 
   await app.bot.start({
     drop_pending_updates: true,

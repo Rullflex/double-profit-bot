@@ -17,7 +17,7 @@ async function main() {
     }
   });
 
-  app.bot.catch(app.logger.error);
+  app.bot.catch((e) => app.logger.error(e));
 
   await app.bot.start({
     allowed_updates: ["message"],

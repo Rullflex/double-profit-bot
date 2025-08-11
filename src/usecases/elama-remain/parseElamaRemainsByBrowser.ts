@@ -97,11 +97,13 @@ async function parseElamaRemainsFromPage(page: Page): Promise<Record<number, Ela
 
   const result: Record<number, ElamaCustomer> = {};
 
+  const sectionHandle = await page.waitForSelector('[data-test="Agency_clientList"]', { timeout: 15000 });
+  logger.debug("🔍 Селектор Agency_clientList найден, начинаем парсинг");
+
   let pageIndex = 1;
   while (true) {
     logger.debug(`📄 Парсим страницу ${pageIndex}`);
 
-    const sectionHandle = await page.waitForSelector('[data-test="Agency_clientList"]', { timeout: 15000 });
 
     const sectionHtml = await page.evaluate(
       (start) => {

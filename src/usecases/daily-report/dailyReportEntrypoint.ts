@@ -2,7 +2,6 @@ import { AppContext } from "@/core/appContext";
 import { getCustomerData, getMoneyRemainData } from "@/infrastructure/google-sheets";
 import { extractChatId } from "@/infrastructure/google-sheets";
 import { REPLY_MESSAGE } from "@/shared/consts";
-import { sendMessageWithRetry } from "@/shared/utils";
 import { Context } from "grammy";
 
 export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
@@ -33,7 +32,7 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       const message = buildMessage(customer.title, remain.ipRemain, remain.elamaRemain, needWarning);
 
       tasks.push(
-        sendMessageWithRetry(app.notificationBotApi, customerChatId, message).then(() => { successCount++; })
+        app.notificationBotApi.sendMessage(customerChatId, message).then(() => { successCount++; })
       );
     }
 

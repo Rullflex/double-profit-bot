@@ -6,7 +6,6 @@ import { AppContext } from "@/core/appContext";
 import { DDsData, getCustomerData, getDDSData } from "@/infrastructure/google-sheets";
 import { extractChatId } from "@/infrastructure/google-sheets";
 import { extractSheetIdFromGLink } from "@/services/google-sheets-service";
-import { sendMessageWithRetry } from "@/shared/utils";
 
 export interface DdsNotificator {
   readJsonData(ctx: AppContext["ctx"]): Promise<void>;
@@ -65,7 +64,7 @@ export function createDdsNotificatorUsecase(app: AppContext): DdsNotificator {
             }
 
             for (const msg of messages) {
-              await sendMessageWithRetry(app.notificationBotApi, chatId, msg);
+              app.notificationBotApi.sendMessage(chatId, msg);
               lastCheckedRow++;
             }
 

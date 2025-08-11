@@ -3,6 +3,7 @@ import { sheets_v4 } from 'googleapis';
 import { createLogger } from '@/services'
 import { getSheetsClient } from '@/services/google-sheets-service';
 import type winston from 'winston';
+import { autoRetry } from "@grammyjs/auto-retry";
 
 export interface ExecutionContext {
   signal: AbortSignal;
@@ -23,9 +24,17 @@ export interface AppContext {
   ctx: ExecutionContext;
 }
 
+/** @see https://grammy.dev/ru/plugins/auto-retry */ 
+const autoRetryTransformer = autoRetry({
+  maxRetryAttempts: 6,
+  maxDelaySeconds: 15,
+});
+
 export async function createAppContext({ botToken, loggerLabel }: AppContextOptions): Promise<AppContext> {
   const bot = new Bot(botToken);
   const notificationBotApi = (new Bot(process.env.EXTERNAL_BOT_TOKEN)).api;
+  notificationBotApi.config.use(autoRetryTransformer);
+
   const logger = createLogger({ botApi: notificationBotApi, label: loggerLabel });
   const sheets = await getSheetsClient();
   const steps: AppContext['steps'] = new Map();

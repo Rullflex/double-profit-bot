@@ -2,7 +2,6 @@ import { AppContext } from "@/core/appContext";
 import { getChatList, getChatListByGroup } from "@/infrastructure/google-sheets";
 import { extractChatId } from "@/infrastructure/google-sheets";
 import { REPLY_MESSAGE } from "@/shared/consts";
-import { sendMessageWithRetry } from "@/shared/utils";
 import { Context } from "grammy";
 
 export async function sendMassMessage(rangeLetter: string, app: AppContext, ctx: Context) {
@@ -16,7 +15,7 @@ export async function sendMassMessage(rangeLetter: string, app: AppContext, ctx:
   await Promise.all(
     chatList.map(async (chatRaw) => {
       const chatId = extractChatId(chatRaw);
-      await sendMessageWithRetry(app.notificationBotApi, chatId, ctx.message.text);
+      await app.notificationBotApi.sendMessage(chatId, ctx.message.text)
       successCount++;
     })
   );

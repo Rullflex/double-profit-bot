@@ -6,7 +6,7 @@
   "scripts": {
     "start:internal": "tsx -r dotenv-flow/config src/bots/internal/index.ts",
     "start:external": "tsx -r dotenv-flow/config src/bots/external/index.ts",
-    "build": "NODE_OPTIONS='--max-old-space-size=4096' tsc",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' tsc && tsc-alias",
     "test": "vitest"
   },
   "author": "Dmitry Gorshkov",
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.18",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"

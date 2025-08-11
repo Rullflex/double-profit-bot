@@ -30,7 +30,10 @@ async function main() {
     }
   });
 
-  app.bot.catch((e) => app.logger.error(e));
+  app.bot.catch((e) => {
+    e.ctx.reply(REPLY_MESSAGE.INTERNAL_ERROR);
+    app.logger.error(e.error)
+  });
 
   await app.bot.start({
     drop_pending_updates: true,

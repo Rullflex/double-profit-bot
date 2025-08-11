@@ -12,7 +12,7 @@ const RUCAPTCHA_API_KEY = process.env.RUCAPTCHA_API_KEY!
 const logger = createLogger({ label: "parseElamaRemainsFromPage" });
 
 export async function parseElamaRemainsByBrowser() {
-  logger.debug("🔍 Начинаем парсинг остатков Elama");
+  logger.debug("🔍 Запускаем puppeteer для парсинга остатков");
   const browser = await puppeteer.launch({
     headless: true,
     executablePath: '/usr/bin/chromium-browser',

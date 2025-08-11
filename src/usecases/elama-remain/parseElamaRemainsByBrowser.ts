@@ -13,7 +13,12 @@ const logger = createLogger({ label: "parseElamaRemainsFromPage" });
 
 export async function parseElamaRemainsByBrowser() {
   logger.debug("🔍 Начинаем парсинг остатков Elama");
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: '/usr/bin/chromium-browser',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+  
   const page = await browser.newPage();
   const solver = new Solver(RUCAPTCHA_API_KEY);
 

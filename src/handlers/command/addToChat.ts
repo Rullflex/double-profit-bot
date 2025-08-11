@@ -11,6 +11,7 @@ export async function handleAddToChat(app: AppContext, ctx: Context) {
 
   const chatList = await getChatList(app.sheets);
   const newEntry = `${ctx.chat.title} ID:${ctx.chat.id}`;
+  if (chatList.includes(newEntry)) return;
   chatList.push(newEntry);
 
   await updateChatList(app.sheets, chatList);

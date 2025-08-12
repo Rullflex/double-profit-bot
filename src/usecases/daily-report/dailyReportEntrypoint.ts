@@ -55,5 +55,5 @@ function buildMessage(customerTitle: string, ipRemain: number, elamaRemain: numb
   return `${date}
 ${customerTitle}
 Остаток елама: ${Math.round(elamaRemain)} ₽.
-Остаток ИП ФЕДИН: ${Math.round(ipRemain)} ₽. ${suffix}`;
+Остаток DP-Marketing: ${Math.round(ipRemain)} ₽. ${suffix}`;
 }

@@ -27,12 +27,14 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       const remain = remainMap.get(customer.title);
       if (!remain) continue;
 
-      const customerChatId = extractChatId(customer.telegramChatRaw);;
+      const customerChatId = extractChatId(customer.telegramChatRaw);
       const needWarning = remain.ipRemain < customer.thresholdBalance;
       const message = buildMessage(customer.title, remain.ipRemain, remain.elamaRemain, needWarning);
 
       tasks.push(
-        app.notificationBotApi.sendMessage(customerChatId, message).then(() => { successCount++; })
+        app.notificationBotApi.sendMessage(customerChatId, message)
+          .then(() => { successCount++; })
+          .catch((e) => { throw new Error(`Не удалось отправить сообщение в чат ${customer.telegramChatRaw}. Возможно, он не существует или бот не в этом чате. Ошибка: ${e.message}`) })
       );
     }
 

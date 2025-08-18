@@ -89,16 +89,13 @@ async function submitLoginToken(page: Page, token: string | null, email: string,
   if (!signinRes.data.backUrl) throw new Error("⚠️ Не получен backUrl из ответа Elama");
 
   await page.goto(signinRes.data.backUrl);
-  await page.waitForNavigation({ timeout: 30000 });
+  await page.waitForNavigation({ timeout: 60000 });
 }
 
 async function parseElamaRemainsFromPage(page: Page, logProgress: (message: string) => void): Promise<Record<number, ElamaCustomer>> {
-  await page.goto("https://new.elama.ru/agency");
-  await page.waitForNavigation({ timeout: 30000 });
-
   // TODO - и чтобы бот фильтр нужный выставлял
   const result: Record<number, ElamaCustomer> = {};
-  const sectionHandle = await page.waitForSelector('[data-test="Agency_clientList"]', { timeout: 45000 });
+  const sectionHandle = await page.waitForSelector('[data-test="Agency_clientList"]', { timeout: 60000 });
 
   let pageIndex = 1;
   while (true) {

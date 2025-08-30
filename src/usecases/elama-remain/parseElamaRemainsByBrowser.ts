@@ -35,7 +35,7 @@ export async function parseElamaRemainsByBrowser(logProgress: (message: string) 
     ]);
   }
 
-  logProgress("Начинаю процесс парсинга остатков клиентов Elama");
+  logProgress("Начинаю процесс парсинга: загружаю страницу, очищаю фильтры и собираю данные");
   const result = await parseElamaRemainsFromPage(page, logProgress);
 
   await browser.close();
@@ -102,7 +102,8 @@ async function submitLoginToken(page: Page, token: string | null, email: string,
 }
 
 async function parseElamaRemainsFromPage(page: Page, logProgress: (message: string) => void): Promise<Record<number, ElamaCustomer>> {
-  // TODO - и чтобы бот фильтр нужный выставлял
+  await clearAllTags(page);
+
   const result: Record<number, ElamaCustomer> = {};
   const sectionHandle = await page.waitForSelector('[data-test="Agency_clientList"]', { timeout: 60000 });
 
@@ -155,11 +156,46 @@ async function parseElamaRemainsFromPage(page: Page, logProgress: (message: stri
       break;
     }
 
+    const currentContent = await sectionHandle.evaluate(el => el.innerHTML);
     await nextButton.click();
-    await sleep(1500); // ожидание обновления страницы
+    
+    await page.waitForFunction(
+      (selector, oldContent) => {
+        const section = document.querySelector(selector);
+        return section && section.innerHTML !== oldContent;
+      },
+      {},
+      '[data-test="Agency_clientList"]',
+      currentContent
+    );
+
     pageIndex++;
   }
 
   logProgress(`🎯 Итог: собрано ${Object.keys(result).length} записей`);
   return result;
+}
+
+async function clearAllTags(page: Page) {
+  const filter = await page.waitForSelector('[data-test="AgencyClientsFilter"]');
+  const clearButton = await filter.$('button[data-test="AgencyClientsFilter__ClearButton"]');
+  await clearButton?.click();
+  await sleep(100);
+
+  const tagFilter = await filter.$('div[type="filter"]');
+  if (tagFilter) {
+    const hasAllText = await tagFilter.evaluate((el) => {
+      return el.textContent?.includes('Все') || false;
+    });
+    
+    if (!hasAllText) {
+      await tagFilter.click();
+      const popover = await filter.waitForSelector('[data-test="MultiSelectList"]', { visible: true });
+      await (await popover.$('label')).click();
+      await sleep(100);
+      const buttons = await popover.$$('button[type="button"]');
+      const applyButton = buttons[buttons.length - 1];
+      await applyButton.click();
+    }
+  }
 }

@@ -1,3 +1,5 @@
+user_data/*
+
 .env*
 !.env.example
 credentials.json

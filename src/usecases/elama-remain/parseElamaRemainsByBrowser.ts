@@ -13,19 +13,27 @@ const logger = createLogger({ label: "parseElamaRemainsFromPage" });
 
 export async function parseElamaRemainsByBrowser(logProgress: (message: string) => void = logger.info) {
   const browser = await puppeteer.launch({
+    userDataDir: './user_data',
     headless: true,
     executablePath: '/usr/bin/chromium-browser',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   
   const page = await browser.newPage();
-  const solver = new Solver(RUCAPTCHA_API_KEY);
+  const response = await page.goto('https://new.elama.ru/agency');
 
-  logProgress("Прохожу авторизацию на сайте Elama");
-  await page.goto("https://account.elama.global/signin");
-  await fillLoginForm(page, EMAIL, PASSWORD);
-  const token = await solveCaptchaIfPresent(page, solver);
-  await submitLoginToken(page, token, EMAIL, PASSWORD);
+  if (response.url().includes('signin')) {
+    logProgress("Прохожу авторизацию на сайте Elama");
+    await fillLoginForm(page, EMAIL, PASSWORD);
+
+    await Promise.any([
+      page.waitForNavigation({ timeout: 60000 }),
+      (async () => {
+        const token = await solveCaptchaIfPresent(page);
+        await submitLoginToken(page, token, EMAIL, PASSWORD);
+      })()
+    ]);
+  }
 
   logProgress("Начинаю процесс парсинга остатков клиентов Elama");
   const result = await parseElamaRemainsFromPage(page, logProgress);
@@ -36,17 +44,18 @@ export async function parseElamaRemainsByBrowser(logProgress: (message: string) 
 }
 
 async function fillLoginForm(page: Page, email: string, password: string) {
-  await page.waitForSelector('[data-test="Field.login"]', { timeout: 15000 });
+  await page.waitForSelector('[data-test="Field.login"]');
   await page.type('[data-test="Field.login"]', email);
   await page.click('[data-test="ButtonSignInNext"]');
 
-  await page.waitForSelector('[data-test="Field.password"]', { timeout: 30000 });
+  await page.waitForSelector('[data-test="Field.password"]');
   await page.type('[data-test="Field.password"]', password);
 
   await page.click('[data-test="ButtonSignInSubmit"]');
 }
 
-async function solveCaptchaIfPresent(page: Page, solver: Solver): Promise<string | null> {
+async function solveCaptchaIfPresent(page: Page): Promise<string | null> {
+  const solver = new Solver(RUCAPTCHA_API_KEY);
   const iframeAppeared = await page.waitForFunction(() => {
     return [...document.querySelectorAll('iframe')].some(iframe => iframe.src.includes("smartcaptcha.yandexcloud.net"));
   }, { timeout: 30000 }).catch(() => null);

@@ -34,7 +34,7 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       tasks.push(
         app.notificationBotApi.sendMessage(customerChatId, message)
           .then(() => { successCount++; })
-          .catch((e) => { throw new Error(`Не удалось отправить сообщение в чат ${customer.telegramChatRaw}. Возможно, он не существует или бот не в этом чате. Ошибка: ${e.message}`) })
+          .catch((e) => { throw new Error(`Не удалось отправить сообщение в чат ${customer.telegramChatRaw}. ${e.message}`) })
       );
     }
 

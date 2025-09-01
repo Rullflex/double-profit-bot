@@ -17,7 +17,7 @@ export async function sendMassMessage(rangeLetter: string, app: AppContext, ctx:
       const chatId = extractChatId(chatRaw);
       await app.notificationBotApi.sendMessage(chatId, ctx.message.text)
         .catch((e) => {
-          throw new Error(`Не удалось отправить сообщение в чат ${chatRaw}. Возможно, он не существует или бот не в этом чате. Ошибка: ${e.message}`);
+          throw new Error(`Не удалось отправить сообщение в чат ${chatRaw}. ${e.message}`);
         });
       successCount++;
     })

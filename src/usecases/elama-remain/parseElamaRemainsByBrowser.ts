@@ -18,29 +18,29 @@ export async function parseElamaRemainsByBrowser(logProgress: (message: string) 
     executablePath: '/usr/bin/chromium-browser',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
-  
-  const page = await browser.newPage();
-  const response = await page.goto('https://new.elama.ru/agency');
 
-  if (response.url().includes('signin')) {
-    logProgress("Прохожу авторизацию на сайте Elama");
-    await fillLoginForm(page, EMAIL, PASSWORD);
+  try {
+    const page = await browser.newPage();
+    const response = await page.goto('https://new.elama.ru/agency');
 
-    await Promise.any([
-      page.waitForNavigation({ timeout: 60000 }),
-      (async () => {
-        const token = await solveCaptchaIfPresent(page);
-        await submitLoginToken(page, token, EMAIL, PASSWORD);
-      })()
-    ]);
+    if (response.url().includes('signin')) {
+      logProgress("Прохожу авторизацию на сайте Elama");
+      await fillLoginForm(page, EMAIL, PASSWORD);
+
+      await Promise.any([
+        page.waitForNavigation({ timeout: 60000 }),
+        (async () => {
+          const token = await solveCaptchaIfPresent(page);
+          await submitLoginToken(page, token, EMAIL, PASSWORD);
+        })()
+      ]);
+    }
+
+    logProgress("Начинаю процесс парсинга: загружаю страницу, очищаю фильтры и собираю данные");
+    return await parseElamaRemainsFromPage(page, logProgress);
+  } finally {
+    await browser.close();
   }
-
-  logProgress("Начинаю процесс парсинга: загружаю страницу, очищаю фильтры и собираю данные");
-  const result = await parseElamaRemainsFromPage(page, logProgress);
-
-  await browser.close();
-
-  return result;
 }
 
 async function fillLoginForm(page: Page, email: string, password: string) {

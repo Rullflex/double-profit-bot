@@ -21,9 +21,12 @@ export async function parseElamaRemainsByBrowser(logProgress: (message: string) 
 
   try {
     const page = await browser.newPage();
-    const response = await page.goto('https://new.elama.ru/agency');
+    await page.goto('https://new.elama.ru/agency');
 
-    if (response.url().includes('signin')) {
+    // Ждем 3 секунды и проверяем, произошел ли редирект на страницу авторизации
+    await sleep(3000);
+
+    if (page.url().includes('signin')) {
       logProgress("Прохожу авторизацию на сайте Elama");
       await fillLoginForm(page, EMAIL, PASSWORD);
 

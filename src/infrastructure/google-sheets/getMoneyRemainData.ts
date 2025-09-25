@@ -46,7 +46,7 @@ export async function getMoneyRemainData(
     })();
 
     const elamaRemain =
-      typeof row[4] === "number" ? row[4] : 0;
+      (elamaId !== -1 && typeof row[4] === "number") ? row[4] : 0;
 
     result.push({
       title,

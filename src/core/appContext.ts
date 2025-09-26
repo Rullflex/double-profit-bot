@@ -24,25 +24,24 @@ export interface AppContext {
   ctx: ExecutionContext;
 }
 
-/** @see https://grammy.dev/ru/plugins/auto-retry */ 
-const autoRetryTransformer = autoRetry({
-  maxRetryAttempts: 6,
-  maxDelaySeconds: 15,
-});
-
 export async function createAppContext({ botToken, loggerLabel }: AppContextOptions): Promise<AppContext> {
   const bot = new Bot(botToken);
-  const notificationBotApi = (new Bot(process.env.EXTERNAL_BOT_TOKEN)).api;
-  notificationBotApi.config.use(autoRetryTransformer);
+  const notificationBot = new Bot(process.env.EXTERNAL_BOT_TOKEN);
 
-  const logger = createLogger({ botApi: notificationBotApi, label: loggerLabel });
+  /** @see https://grammy.dev/ru/plugins/auto-retry */ 
+  notificationBot.api.config.use(autoRetry({
+    maxRetryAttempts: 6,
+    maxDelaySeconds: 120,
+  }));
+
+  const logger = createLogger({ botApi: notificationBot.api, label: loggerLabel });
   const sheets = await getSheetsClient();
   const steps: AppContext['steps'] = new Map();
   const abortController = new AbortController();
 
   return {
     bot,
-    notificationBotApi,
+    notificationBotApi: notificationBot.api,
     logger,
     sheets,
     steps,

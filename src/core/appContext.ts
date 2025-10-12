@@ -31,7 +31,6 @@ export async function createAppContext({ botToken, loggerLabel }: AppContextOpti
   /** @see https://grammy.dev/ru/plugins/auto-retry */ 
   notificationBot.api.config.use(autoRetry({
     maxRetryAttempts: 6,
-    maxDelaySeconds: 120,
   }));
 
   const logger = createLogger({ botApi: notificationBot.api, label: loggerLabel });

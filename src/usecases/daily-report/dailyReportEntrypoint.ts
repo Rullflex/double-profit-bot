@@ -38,11 +38,7 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       );
     }
 
-    // Add a timeout for all tasks (90 seconds)
-    let timeoutId: NodeJS.Timeout;
-    const timeout = new Promise<void>((_, reject) => { timeoutId = setTimeout(() => reject(new Error("Timeout")), 90000) });
-    await Promise.race([Promise.all(tasks), timeout]);
-    timeoutId ?? clearTimeout(timeoutId);
+    await Promise.all(tasks)
 
     const finalMessage = successCount < tasks.length ? REPLY_MESSAGE.DAILY_REPORT_FAIL : REPLY_MESSAGE.DAILY_REPORT_SUCCESS;
     await ctx.reply(finalMessage);

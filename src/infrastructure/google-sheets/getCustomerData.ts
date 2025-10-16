@@ -24,11 +24,15 @@ export async function getCustomerData(
   const customerList: CustomerData[] = [];
 
   for (const row of values) {
-    if (row.length < 4) {
+    if (row.length < 3) {
       throw new Error(`bad value length, row: ${JSON.stringify(row)}`);
     }
 
     const [title, gLink, threshold, chatRaw] = row;
+
+    if (!chatRaw) {
+      continue;
+    }
 
     if (typeof title !== "string") {
       throw new Error(`invalid title type, row: ${JSON.stringify(row)}`);

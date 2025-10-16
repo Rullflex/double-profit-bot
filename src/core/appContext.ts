@@ -29,9 +29,7 @@ export async function createAppContext({ botToken, loggerLabel }: AppContextOpti
   const notificationBot = new Bot(process.env.EXTERNAL_BOT_TOKEN);
 
   /** @see https://grammy.dev/ru/plugins/auto-retry */ 
-  notificationBot.api.config.use(autoRetry({
-    maxRetryAttempts: 6,
-  }));
+  notificationBot.api.config.use(autoRetry());
 
   const logger = createLogger({ botApi: notificationBot.api, label: loggerLabel });
   const sheets = await getSheetsClient();

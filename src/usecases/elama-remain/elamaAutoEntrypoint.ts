@@ -4,10 +4,13 @@ import { type AppContext } from '@/core/appContext';
 import { REPLY_MESSAGE } from '@/shared/consts';
 import { parseElamaRemainsByBrowser } from './parseElamaRemainsByBrowser';
 
-export async function elamaAutoEntrypoint({ sheets }: AppContext, ctx: Context) {
+export async function elamaAutoEntrypoint({ logger, sheets }: AppContext, ctx: Context) {
   const sent = await ctx.reply(REPLY_MESSAGE.ELAMA_COMMAND);
   
-  const logProgress = (message: string) =>  ctx.api.editMessageText(sent.chat.id, sent.message_id, message);
+  const logProgress = (message: string) =>  {
+    ctx.api.editMessageText(sent.chat.id, sent.message_id, message)
+    logger.info(message);
+  };
   const parsedElamaRemains = await parseElamaRemainsByBrowser(logProgress);
 
   const currentRemains = await getMoneyRemainData(sheets);

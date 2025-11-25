@@ -3,7 +3,7 @@ import { TelegramTransport } from "./telegram-transport";
 import { Api } from "grammy";
 
 export const createLogger = (options: { botApi?: Api; label?: string }): winston.Logger => winston.createLogger({
-  level: "debug",
+  level: process.env.LOG_LEVEL || "info",
   format: winston.format.combine(
     winston.format.errors({ stack: true }),
     winston.format.timestamp({ format: "DD.MM.YYYY HH:mm:ss" }),

@@ -16,7 +16,7 @@ export const createLogger = (options: { botApi?: Api; label?: string }): winston
   ),
   transports: [
     new winston.transports.Console(),
-    ...(options.botApi ? [new TelegramTransport({
+    ...(options.botApi && process.env.LOG_CHAT_ID ? [new TelegramTransport({
       level: "error",
       botApi: options.botApi,
       chatId: process.env.LOG_CHAT_ID,

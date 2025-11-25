@@ -17,4 +17,6 @@ export async function handleRemoveFromChat(app: AppContext, ctx: Context) {
   }
 
   await updateChatList(app.sheets, filteredList);
+
+  app.logger.info(`Удален чат ID:${chatId}`);
 }

@@ -16,4 +16,6 @@ export async function handleAddToChat(app: AppContext, ctx: Context) {
 
   await updateChatList(app.sheets, chatList);
   await ctx.reply(REPLY_MESSAGE.ADD_TO_CHAT_SUCCESS);
+
+  app.logger.info(`Добавлен чат ${newEntry}`);
 }

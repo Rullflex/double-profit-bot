@@ -14,4 +14,6 @@ export async function handleChangeChatTitle(app: AppContext, ctx: Context) {
   );
 
   await updateChatList(app.sheets, updatedList);
+
+  app.logger.info(`Изменен чат ID:${chatId}. Новое название: ${newTitle}`);
 }

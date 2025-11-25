@@ -8,6 +8,8 @@ async function main() {
     loggerLabel: "external",
   });
 
+  app.bot.api.setMyCommands([]);
+
   app.bot.on("message:new_chat_members", handleAddToChat.bind(null, app));
   app.bot.on("message:left_chat_member", handleRemoveFromChat.bind(null, app));
   app.bot.on("message:new_chat_title", handleChangeChatTitle.bind(null, app));

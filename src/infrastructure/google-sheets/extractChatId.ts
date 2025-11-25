@@ -1,17 +1,17 @@
 export function extractChatId(rawChatData: string): number {
-  const prefix = "ID:";
-  const index = rawChatData.lastIndexOf(prefix);
+  const prefix = 'ID:'
+  const index = rawChatData.lastIndexOf(prefix)
 
   if (index !== -1 && index + prefix.length < rawChatData.length) {
-    const idStr = rawChatData.slice(index + prefix.length).trim();
-    const id = parseInt(idStr, 10);
+    const idStr = rawChatData.slice(index + prefix.length).trim()
+    const id = Number.parseInt(idStr, 10)
 
-    if (isNaN(id)) {
-      throw new Error("Invalid chat ID format");
+    if (Number.isNaN(id)) {
+      throw new TypeError('Invalid chat ID format')
     }
 
-    return id;
+    return id
   }
 
-  throw new Error("Chat ID not found in string");
+  throw new Error('Chat ID not found in string')
 }

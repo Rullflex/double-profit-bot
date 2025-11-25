@@ -7,16 +7,16 @@
  * @return {string}
  */
 export function plural(number: number, strings: string[]) {
-  const num = Math.abs(number); // Работаем с положительным значением числа
+  const num = Math.abs(number) // Работаем с положительным значением числа
 
   if (Number.isInteger(num)) {
-    const cases = [2, 0, 1, 1, 1, 2];
+    const cases = [2, 0, 1, 1, 1, 2]
 
     return strings[
       num % 100 > 4 && num % 100 < 20 ? 2 : cases[num % 10 < 5 ? num % 10 : 5]
-    ];
+    ]
   }
 
   // Для дробных чисел всегда возвращаем второй вариант
-  return strings[1];
+  return strings[1]
 }

@@ -1,4 +1,4 @@
 export interface ElamaCustomer {
-  elamaId: number;
-  remain: number;
+  elamaId: number
+  remain: number
 }

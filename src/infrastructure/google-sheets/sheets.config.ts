@@ -1,2 +1,2 @@
-export const DATA_SPREADSHEET_ID = process.env.DATA_SPREADSHEET_ID;
-export const MONEY_SPREADSHEET_ID = process.env.MONEY_SPREADSHEET_ID;
+export const DATA_SPREADSHEET_ID = process.env.DATA_SPREADSHEET_ID
+export const MONEY_SPREADSHEET_ID = process.env.MONEY_SPREADSHEET_ID

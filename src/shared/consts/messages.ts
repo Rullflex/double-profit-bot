@@ -1,4 +1,4 @@
-import { plural } from "../utils";
+import { plural } from '../utils'
 
 export const REPLY_MESSAGE = {
   INTERNAL_ERROR: 'Произошла внутренняя ошибка. Попробуйте еще раз или сообщите администратору.',
@@ -27,5 +27,5 @@ Safari — «Сохранить как... → Веб-архив»`,
   ADD_TO_CHAT_SUCCESS: `
 Всем привет!
 Контакт установлен
-👉👈`
-} as const;
+👉👈`,
+} as const

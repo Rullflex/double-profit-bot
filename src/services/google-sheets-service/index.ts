@@ -1,1 +1,1 @@
-export * from './GoogleSheetsService';
+export * from './GoogleSheetsService'

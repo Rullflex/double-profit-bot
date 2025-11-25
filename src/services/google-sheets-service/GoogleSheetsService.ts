@@ -1,15 +1,16 @@
-import { google, sheets_v4 } from "googleapis";
-import { authorize } from "./authorize";
+import type { sheets_v4 } from 'googleapis'
+import { google } from 'googleapis'
+import { authorize } from './authorize'
 
-let cachedSheetsClient: sheets_v4.Sheets | null = null;
+let cachedSheetsClient: sheets_v4.Sheets | null = null
 
 export async function getSheetsClient(): Promise<sheets_v4.Sheets> {
   if (!cachedSheetsClient) {
-    const auth = await authorize();
-    cachedSheetsClient = google.sheets({ version: "v4", auth });
+    const auth = await authorize()
+    cachedSheetsClient = google.sheets({ version: 'v4', auth })
   }
 
-  return cachedSheetsClient;
+  return cachedSheetsClient
 }
 
 /**
@@ -22,6 +23,6 @@ export async function getSheetsClient(): Promise<sheets_v4.Sheets> {
  * returns an empty string.
  */
 export function extractSheetIdFromGLink(link: string): string {
-  const match = /\/d\/([^/]+)/.exec(link);
-  return match?.[1] || "";
+  const match = /\/d\/([^/]+)/.exec(link)
+  return match?.[1] || ''
 }

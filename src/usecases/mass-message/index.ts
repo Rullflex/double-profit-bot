@@ -1,1 +1,1 @@
-export { massMessageEntrypoint } from './massMessageEntrypoint';
+export { massMessageEntrypoint } from './massMessageEntrypoint'

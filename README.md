@@ -17,7 +17,7 @@
 
 ## 🧱 Структура проекта
 
-```
+```text
 src/
 ├── bots/                  # Входные точки для ботов
 │   ├── internal/
@@ -62,7 +62,8 @@ npx vitest run
 
 - Используется `credentials.json` сервисного аккаунта
 - Таблицы должны быть расшарены на email аккаунта:
-  ```
+
+  ```text
   my-service-account@your-project.iam.gserviceaccount.com
   ```
 
@@ -71,7 +72,8 @@ npx vitest run
 ## 📂 Переменные окружения
 
 `.env`:
-```
+
+```env
 INTERNAL_BOT_TOKEN=...
 EXTERNAL_BOT_TOKEN=...
 ```
@@ -81,10 +83,11 @@ EXTERNAL_BOT_TOKEN=...
 ## 🧠 Контекст выполнения
 
 Через `AbortController`:
+
 ```ts
 ctx: {
-  signal: AbortSignal;
-  cancel: () => void;
+  signal: AbortSignal
+  cancel: () => void 0
 }
 ```
 

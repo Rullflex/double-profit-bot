@@ -15,8 +15,6 @@ export async function parseElamaRemainsByBrowser(logProgress: (message: string) 
   const browser = await puppeteer.launch({
     userDataDir: './user_data',
     headless: true,
-    executablePath: '/usr/bin/chromium-browser',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
   try {

@@ -17,4 +17,6 @@ export async function handleChangeChatId(app: AppContext, ctx: Context) {
   )
 
   await updateChatList(app.sheets, updatedList)
+
+  app.logger.info(`Обновлен чат ${ctx.chat.title} ID:${migrateFromId} -> ID:${migrateToId}`)
 }

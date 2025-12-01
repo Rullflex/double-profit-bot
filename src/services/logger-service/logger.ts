@@ -1,8 +1,7 @@
-import type { Api } from 'grammy'
 import winston from 'winston'
 import { TelegramTransport } from './telegram-transport'
 
-export function createLogger(options: { botApi?: Api, label?: string }): winston.Logger {
+export function createLogger(options: { label?: string }): winston.Logger {
   return winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
     format: winston.format.combine(
@@ -17,10 +16,10 @@ export function createLogger(options: { botApi?: Api, label?: string }): winston
     ),
     transports: [
       new winston.transports.Console(),
-      ...(options.botApi && process.env.LOG_CHAT_ID
+      ...(process.env.LOG_CHAT_ID
         ? [new TelegramTransport({
             level: 'error',
-            botApi: options.botApi,
+            botToken: process.env.EXTERNAL_BOT_TOKEN,
             chatId: process.env.LOG_CHAT_ID,
           })]
         : []),

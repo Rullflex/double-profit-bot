@@ -1,10 +1,10 @@
 import type { sheets_v4 } from 'googleapis'
-import type { Api, Context } from 'grammy'
+import type { Context } from 'grammy'
 import type winston from 'winston'
-import { autoRetry } from '@grammyjs/auto-retry'
 import { Bot } from 'grammy'
 import { createLogger } from '@/services'
 import { getSheetsClient } from '@/services/google-sheets-service'
+import { createNotification } from '@/services/notification-service'
 
 export interface ExecutionContext {
   signal: AbortSignal
@@ -18,7 +18,7 @@ export interface AppContextOptions {
 
 export interface AppContext {
   bot: Bot
-  notificationBotApi: Api
+  notification: ReturnType<typeof createNotification>
   logger: winston.Logger
   sheets: sheets_v4.Sheets
   steps: Map<number, (app: AppContext, ctx: Context) => Promise<void>>
@@ -27,19 +27,16 @@ export interface AppContext {
 
 export async function createAppContext({ botToken, loggerLabel }: AppContextOptions): Promise<AppContext> {
   const bot = new Bot(botToken)
-  const notificationBot = new Bot(process.env.EXTERNAL_BOT_TOKEN)
 
-  /** @see https://grammy.dev/ru/plugins/auto-retry */
-  notificationBot.api.config.use(autoRetry())
-
-  const logger = createLogger({ botApi: notificationBot.api, label: loggerLabel })
+  const notification = createNotification()
+  const logger = createLogger({ label: loggerLabel })
   const sheets = await getSheetsClient()
   const steps: AppContext['steps'] = new Map()
   const abortController = new AbortController()
 
   return {
     bot,
-    notificationBotApi: notificationBot.api,
+    notification,
     logger,
     sheets,
     steps,

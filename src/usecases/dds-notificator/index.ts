@@ -64,7 +64,7 @@ export function createDdsNotificatorUsecase(app: AppContext): DdsNotificator {
             }
 
             for (const msg of messages) {
-              app.notificationBotApi.sendMessage(chatId, msg)
+              app.notification.send(chatId, msg)
               lastCheckedRow++
             }
 

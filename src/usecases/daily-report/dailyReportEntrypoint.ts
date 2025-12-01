@@ -33,7 +33,7 @@ export async function dailyReportEntrypoint(app: AppContext, ctx: Context) {
       const message = buildMessage(customer.title, remain.ipRemain, remain.elamaRemain, needWarning)
 
       tasks.push(
-        app.notificationBotApi.sendMessage(customerChatId, message)
+        app.notification.send(customerChatId, message)
           .then(() => { successCount++ })
           .catch((e) => { throw new Error(`Не удалось отправить сообщение в чат ${customer.telegramChatRaw}. ${e.message}`) }),
       )

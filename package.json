@@ -6,8 +6,8 @@
   "license": "ISC",
   "main": "dist/index.js",
   "scripts": {
-    "start:internal": "tsx -r dotenv-flow/config src/bots/internal/index.ts",
-    "start:external": "tsx -r dotenv-flow/config src/bots/external/index.ts",
+    "dev:internal": "tsx -r dotenv-flow/config src/bots/internal/index.ts",
+    "dev:external": "tsx -r dotenv-flow/config src/bots/external/index.ts",
     "build": "tsc && tsc-alias",
     "test": "vitest",
     "lint": "eslint",

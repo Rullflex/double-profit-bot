@@ -1,8 +1,8 @@
 import type { Buffer } from 'node:buffer'
-import type { ElamaCustomer } from './types'
+import type { ParsedElamaRemains } from './types'
 
-export function parseElamaRemains(buffer: Buffer): Record<number, ElamaCustomer> {
-  const result: Record<number, ElamaCustomer> = {}
+export function parseElamaRemainsFromFile(buffer: Buffer): ParsedElamaRemains {
+  const result: ParsedElamaRemains = {}
   const str = buffer.toString()
   const startIdx = str.indexOf('data-test="Agency_clientList"')
   if (startIdx === -1)

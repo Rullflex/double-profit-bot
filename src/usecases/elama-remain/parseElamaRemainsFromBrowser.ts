@@ -1,5 +1,5 @@
 import type { Page } from 'puppeteer'
-import type { ElamaCustomer } from './types'
+import type { ParsedElamaRemains } from './types'
 import { Solver } from '@2captcha/captcha-solver'
 import axios from 'axios'
 import puppeteer from 'puppeteer'
@@ -10,9 +10,9 @@ const EMAIL = process.env.ELAMA_EMAIL!
 const PASSWORD = process.env.ELAMA_PASSWORD!
 const RUCAPTCHA_API_KEY = process.env.RUCAPTCHA_API_KEY!
 
-const logger = createLogger({ label: 'parseElamaRemainsFromPage' })
+const logger = createLogger({ label: 'parseElamaRemainsFromBrowser' })
 
-export async function parseElamaRemainsByBrowser(logProgress: (message: string) => void = logger.info) {
+export async function parseElamaRemainsFromBrowser(logProgress: (message: string) => void = logger.info) {
   const browser = await puppeteer.launch({
     userDataDir: './user_data',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -107,10 +107,10 @@ async function submitLoginToken(page: Page, token: string | null, email: string,
   await page.waitForNavigation({ timeout: 60000 })
 }
 
-async function parseElamaRemainsFromPage(page: Page, logProgress: (message: string) => void): Promise<Record<number, ElamaCustomer>> {
+async function parseElamaRemainsFromPage(page: Page, logProgress: (message: string) => void): Promise<ParsedElamaRemains> {
   await clearAllTags(page)
 
-  const result: Record<number, ElamaCustomer> = {}
+  const result: ParsedElamaRemains = {}
   const sectionHandle = await page.waitForSelector('[data-test="Agency_clientList"]', { timeout: 60000 })
 
   let pageIndex = 1

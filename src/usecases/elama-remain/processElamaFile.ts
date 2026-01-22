@@ -3,7 +3,7 @@ import type { AppContext } from '@/core/appContext'
 import { getMoneyRemainData, updateCommonMoneyRemain } from '@/infrastructure/google-sheets'
 import { REPLY_MESSAGE } from '@/shared/consts'
 import { getFileBuffer } from '@/shared/utils'
-import { parseElamaRemains } from './parseElamaRemains'
+import { parseElamaRemainsFromFile } from './parseElamaRemainsFromFile'
 
 export async function processElamaFile({ sheets, steps }: AppContext, ctx: Context) {
   const document = ctx.message?.document
@@ -14,7 +14,7 @@ export async function processElamaFile({ sheets, steps }: AppContext, ctx: Conte
 
   const fileId = document.file_id
   const buffer = await getFileBuffer(ctx.api, fileId)
-  const parsedElamaRemains = parseElamaRemains(buffer)
+  const parsedElamaRemains = parseElamaRemainsFromFile(buffer)
 
   const currentRemains = await getMoneyRemainData(sheets)
 

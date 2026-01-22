@@ -2,7 +2,7 @@ import type { Context } from 'grammy'
 import type { AppContext } from '@/core/appContext'
 import { getMoneyRemainData, updateCommonMoneyRemain } from '@/infrastructure/google-sheets'
 import { REPLY_MESSAGE } from '@/shared/consts'
-import { parseElamaRemainsByBrowser } from './parseElamaRemainsByBrowser'
+import { parseElamaRemainsFromBrowser } from './parseElamaRemainsFromBrowser'
 
 export async function elamaAutoEntrypoint({ logger, sheets }: AppContext, ctx: Context) {
   const sent = await ctx.reply(REPLY_MESSAGE.ELAMA_COMMAND)
@@ -11,7 +11,7 @@ export async function elamaAutoEntrypoint({ logger, sheets }: AppContext, ctx: C
     ctx.api.editMessageText(sent.chat.id, sent.message_id, message)
     logger.info(message)
   }
-  const parsedElamaRemains = await parseElamaRemainsByBrowser(logProgress)
+  const parsedElamaRemains = await parseElamaRemainsFromBrowser(logProgress)
 
   const currentRemains = await getMoneyRemainData(sheets)
 

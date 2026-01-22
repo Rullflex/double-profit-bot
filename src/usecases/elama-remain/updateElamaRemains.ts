@@ -1,7 +1,7 @@
 import type { ParsedElamaRemains } from './types'
 import type { MoneyRemainData } from '@/infrastructure/google-sheets'
 
-export function updateRemains(currentRemains: MoneyRemainData[], parsedRemains: ParsedElamaRemains) {
+export function updateElamaRemains(currentRemains: MoneyRemainData[], parsedRemains: ParsedElamaRemains) {
   let updatedCount = 0
 
   for (const current of currentRemains) {

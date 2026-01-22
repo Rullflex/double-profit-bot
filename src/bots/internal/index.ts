@@ -1,9 +1,8 @@
 import { createAppContext } from '@/core/appContext'
-import { handleElamaFile, handleReset, handleStart } from '@/handlers/command'
+import { handleElamaAuto, handleElamaManual, handleReset, handleStart } from '@/handlers/command'
 import { handleStepIfExists } from '@/handlers/message'
 import { REPLY_MESSAGE } from '@/shared/consts'
 import { dailyReportEntrypoint } from '@/usecases/daily-report'
-import { elamaAutoEntrypoint } from '@/usecases/elama-remain'
 import { massMessageEntrypoint } from '@/usecases/mass-message'
 import { InternalCommand, internalCommandList } from './const'
 
@@ -16,8 +15,8 @@ async function main() {
   await app.bot.api.setMyCommands(internalCommandList)
 
   app.bot.command(InternalCommand.START, handleStart)
-  app.bot.command(InternalCommand.ELAMA, elamaAutoEntrypoint.bind(null, app))
-  app.bot.command(InternalCommand.ELAMA_FILE, handleElamaFile.bind(null, app))
+  app.bot.command(InternalCommand.ELAMA, handleElamaAuto.bind(null, app))
+  app.bot.command(InternalCommand.ELAMA_MANUAL, handleElamaManual.bind(null, app))
   app.bot.command(InternalCommand.DAILYREPORT, dailyReportEntrypoint.bind(null, app))
   app.bot.command(InternalCommand.MASSMESSAGE, massMessageEntrypoint.bind(null, app))
   app.bot.command(InternalCommand.RESET, handleReset.bind(null, app))

@@ -1,2 +1,1 @@
-export { elamaAutoEntrypoint } from './elamaAutoEntrypoint'
-export { processElamaFile } from './processElamaFile'
+export { processElamaRemains } from './processElamaRemains'

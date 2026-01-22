@@ -3,6 +3,7 @@ import type { AppContext } from '@/core/appContext'
 import { getMoneyRemainData, updateCommonMoneyRemain } from '@/infrastructure/google-sheets'
 import { REPLY_MESSAGE } from '@/shared/consts'
 import { parseElamaRemainsFromBrowser } from './parseElamaRemainsFromBrowser'
+import { updateRemains } from './updateRemains'
 
 export async function elamaAutoEntrypoint({ logger, sheets }: AppContext, ctx: Context) {
   const sent = await ctx.reply(REPLY_MESSAGE.ELAMA_COMMAND)
@@ -15,17 +16,9 @@ export async function elamaAutoEntrypoint({ logger, sheets }: AppContext, ctx: C
 
   const currentRemains = await getMoneyRemainData(sheets)
 
-  let updatedCount = 0
+  const { updatedCount, updatedRemains } = updateRemains(currentRemains, parsedElamaRemains)
 
-  for (const current of currentRemains) {
-    const parsed = parsedElamaRemains[current.elamaId]
-    if (parsed) {
-      current.elamaRemain = parsed.remain
-      updatedCount++
-    }
-  }
-
-  await updateCommonMoneyRemain(sheets, currentRemains)
+  await updateCommonMoneyRemain(sheets, updatedRemains)
 
   await ctx.reply(REPLY_MESSAGE.ELAMA_SUCCESS_UPDATE(updatedCount))
 }

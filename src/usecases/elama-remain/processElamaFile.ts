@@ -4,6 +4,7 @@ import { getMoneyRemainData, updateCommonMoneyRemain } from '@/infrastructure/go
 import { REPLY_MESSAGE } from '@/shared/consts'
 import { getFileBuffer } from '@/shared/utils'
 import { parseElamaRemainsFromFile } from './parseElamaRemainsFromFile'
+import { updateRemains } from './updateRemains'
 
 export async function processElamaFile({ sheets, steps }: AppContext, ctx: Context) {
   const document = ctx.message?.document
@@ -18,17 +19,9 @@ export async function processElamaFile({ sheets, steps }: AppContext, ctx: Conte
 
   const currentRemains = await getMoneyRemainData(sheets)
 
-  let updatedCount = 0
+  const { updatedCount, updatedRemains } = updateRemains(currentRemains, parsedElamaRemains)
 
-  for (const current of currentRemains) {
-    const parsed = parsedElamaRemains[current.elamaId]
-    if (parsed) {
-      current.elamaRemain = parsed.remain
-      updatedCount++
-    }
-  }
-
-  await updateCommonMoneyRemain(sheets, currentRemains)
+  await updateCommonMoneyRemain(sheets, updatedRemains)
 
   await ctx.reply(REPLY_MESSAGE.ELAMA_SUCCESS_UPDATE(updatedCount))
   steps.delete(ctx.from.id)

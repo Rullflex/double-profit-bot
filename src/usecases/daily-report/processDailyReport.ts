@@ -1,0 +1,42 @@
+import type { AppContext } from '@/core/appContext'
+import { extractChatId, getCustomerData, getMoneyRemainData } from '@/infrastructure/google-sheets'
+
+export async function processDailyReport(app: AppContext) {
+  const customers = await getCustomerData(app.sheets)
+  const remainData = await getMoneyRemainData(app.sheets)
+
+  const remainMap = new Map<string, typeof remainData[0]>()
+  remainData.forEach(data => remainMap.set(data.title, data))
+
+  const tasks: Promise<void>[] = []
+  let successCount = 0
+
+  for (const customer of customers) {
+    const remain = remainMap.get(customer.title)
+    if (!remain)
+      continue
+
+    const customerChatId = extractChatId(customer.telegramChatRaw)
+    const needWarning = remain.ipRemain < customer.thresholdBalance
+    const message = buildMessage(customer.title, remain.ipRemain, remain.elamaRemain, needWarning)
+
+    tasks.push(
+      app.notification.send(customerChatId, message)
+        .then(() => { successCount++ })
+        .catch((e) => { throw new Error(`Не удалось отправить сообщение в чат ${customer.telegramChatRaw}. ${e.message}`) }),
+    )
+  }
+
+  await Promise.all(tasks)
+
+  return { totalTasks: tasks.length, successCount }
+}
+
+function buildMessage(customerTitle: string, ipRemain: number, elamaRemain: number, needWarning: boolean): string {
+  const suffix = needWarning ? `(❗️нужно пополнить❗️)` : ''
+  const date = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })
+  return `${date}
+${customerTitle}
+Остаток елама: ${Math.round(elamaRemain)} ₽.
+Остаток DP-Marketing: ${Math.round(ipRemain)} ₽. ${suffix}`
+}

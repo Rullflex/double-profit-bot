@@ -1,6 +1,7 @@
 export * from './addToChat'
 export * from './changeChatId'
 export * from './changeChatTitle'
+export * from './dailyReport'
 export * from './elama'
 export * from './removeFromChat'
 export * from './reset'

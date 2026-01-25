@@ -1,1 +1,1 @@
-export { dailyReportEntrypoint } from './dailyReportEntrypoint'
+export { processDailyReport } from './processDailyReport'

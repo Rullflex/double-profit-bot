@@ -1,7 +1,7 @@
 import winston from 'winston'
 import { TelegramTransport } from './telegram-transport'
 
-export function createLogger(options: { label?: string }): winston.Logger {
+export function createLogger(options: { label?: string } = {}): winston.Logger {
   return winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
     format: winston.format.combine(

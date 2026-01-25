@@ -1,7 +1,6 @@
 import type { sheets_v4 } from 'googleapis'
 import type { Context } from 'grammy'
 import type winston from 'winston'
-import { Bot } from 'grammy'
 import { createLogger } from '@/services'
 import { getSheetsClient } from '@/services/google-sheets-service'
 import { createNotification } from '@/services/notification-service'
@@ -12,12 +11,10 @@ export interface ExecutionContext {
 }
 
 export interface AppContextOptions {
-  botToken: string
   loggerLabel?: string
 }
 
 export interface AppContext {
-  bot: Bot
   notification: ReturnType<typeof createNotification>
   logger: winston.Logger
   sheets: sheets_v4.Sheets
@@ -25,9 +22,7 @@ export interface AppContext {
   ctx: ExecutionContext
 }
 
-export async function createAppContext({ botToken, loggerLabel }: AppContextOptions): Promise<AppContext> {
-  const bot = new Bot(botToken)
-
+export async function createAppContext({ loggerLabel }: AppContextOptions = {}): Promise<AppContext> {
   const notification = createNotification()
   const logger = createLogger({ label: loggerLabel })
   const sheets = await getSheetsClient()
@@ -35,7 +30,6 @@ export async function createAppContext({ botToken, loggerLabel }: AppContextOpti
   const abortController = new AbortController()
 
   return {
-    bot,
     notification,
     logger,
     sheets,

@@ -9,11 +9,8 @@ export const enum TaskName {
 }
 
 export function registerTasks(app: AppContext) {
-  const ddsNotificationsTask = registerDdsNotificationsTask(app)
-  const remainsTask = registerRemainsTask(app)
-
-  app.tasks.set(TaskName.DDS_NOTIFICATIONS, ddsNotificationsTask)
-  app.tasks.set(TaskName.REMAINS, remainsTask)
+  registerDdsNotificationsTask(app)
+  registerRemainsTask(app)
 
   // в режиме разработки останавливаем все задачи
   if (process.env.NODE_ENV === 'development') {

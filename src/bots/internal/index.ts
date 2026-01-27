@@ -1,6 +1,6 @@
 import type { AppContext } from '@/core'
 import { Bot } from 'grammy'
-import { handleDailyReport, handleElamaAuto, handleElamaManual, handleExecuteRemainsTask, handleReset, handleStart } from '@/handlers/command'
+import { handleDailyReport, handleElamaAuto, handleElamaManual, handleReset, handleStart } from '@/handlers/command'
 import { handleStepIfExists } from '@/handlers/message'
 import { REPLY_MESSAGE } from '@/shared/consts'
 import { massMessageEntrypoint } from '@/usecases/mass-message'
@@ -16,7 +16,6 @@ export async function registerInternalBot(app: AppContext) {
   bot.command(InternalCommand.ELAMA_MANUAL, handleElamaManual.bind(null, app))
   bot.command(InternalCommand.DAILYREPORT, handleDailyReport.bind(null, app))
   bot.command(InternalCommand.MASSMESSAGE, massMessageEntrypoint.bind(null, app))
-  bot.command(InternalCommand.EXECUTE_REMAINS_TASK, handleExecuteRemainsTask.bind(null, app))
   bot.command(InternalCommand.RESET, handleReset.bind(null, app))
 
   bot.on(['message', 'callback_query:data'], async (ctx) => {

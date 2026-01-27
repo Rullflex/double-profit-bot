@@ -39,5 +39,5 @@ export function registerRemainsTask(app: AppContext) {
     app.logger.info(`Daily report processed: ${successCount}/${totalTasks} reports sent`)
 
     return { updatedCount, totalTasks, successCount } satisfies RemainsTaskResult
-  }, { timezone: 'Europe/Moscow', name: TaskName.REMAINS })
+  }, { timezone: 'Europe/Moscow', name: TaskName.REMAINS, noOverlap: true })
 }

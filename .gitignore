@@ -1,4 +1,5 @@
 user_data/*
+**/dds-last-state.json
 
 .env*
 !.env.example

@@ -19,6 +19,7 @@
     "dotenv-flow": "^4.1.0",
     "googleapis": "^148.0.0",
     "grammy": "^1.36.1",
+    "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
     "puppeteer": "^24.15.0",
     "winston": "^3.17.0",

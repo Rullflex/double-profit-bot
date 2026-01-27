@@ -6,6 +6,7 @@ export const enum InternalCommand {
   ELAMA_MANUAL = 'elama_file',
   DAILYREPORT = 'dailyreport',
   MASSMESSAGE = 'massmessage',
+  EXECUTE_REMAINS_TASK = 'execute_remains_task',
   RESET = 'reset',
 }
 
@@ -14,5 +15,6 @@ export const internalCommandList: BotCommand[] = [
   { command: InternalCommand.ELAMA_MANUAL, description: 'Ручная обновление остатков по файлу из elama (устаревшее)' },
   { command: InternalCommand.DAILYREPORT, description: 'Отчёт по дням' },
   { command: InternalCommand.MASSMESSAGE, description: 'Массовая рассылка' },
+  { command: InternalCommand.EXECUTE_REMAINS_TASK, description: 'Ручной запуск процесса отчета по остаткам' },
   { command: InternalCommand.RESET, description: 'Сбросить состояние' },
 ]

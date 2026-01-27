@@ -7,11 +7,6 @@ import { createLogger } from '@/services'
 import { getSheetsClient } from '@/services/google-sheets-service'
 import { createNotification } from '@/services/notification-service'
 
-export interface ExecutionContext {
-  signal: AbortSignal
-  cancel: () => void
-}
-
 export interface AppContextOptions {
   loggerLabel?: string
 }
@@ -22,7 +17,6 @@ export interface AppContext {
   sheets: sheets_v4.Sheets
   steps: Map<number, (app: AppContext, ctx: Context) => Promise<void>>
   tasks: Map<TaskName, ScheduledTask>
-  ctx: ExecutionContext
 }
 
 export async function createAppContext({ loggerLabel }: AppContextOptions = {}): Promise<AppContext> {
@@ -31,7 +25,6 @@ export async function createAppContext({ loggerLabel }: AppContextOptions = {}):
   const sheets = await getSheetsClient()
   const steps: AppContext['steps'] = new Map()
   const tasks = new Map<TaskName, ScheduledTask>()
-  const abortController = new AbortController()
 
   return {
     notification,
@@ -39,9 +32,5 @@ export async function createAppContext({ loggerLabel }: AppContextOptions = {}):
     sheets,
     steps,
     tasks,
-    ctx: {
-      signal: abortController.signal,
-      cancel: () => abortController.abort(),
-    },
   }
 }

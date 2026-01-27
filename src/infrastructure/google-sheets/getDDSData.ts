@@ -6,16 +6,16 @@ export interface DDsData {
   description: string
 }
 
-const IP_REMAIN_RANGE = 'ДДС!D2'
+const DDS_LIST_NAME = 'Движение денежных средств'
 
 export async function getDDSData(
   sheets: sheets_v4.Sheets,
   spreadsheetId: string,
-  targetRange: string,
+  lastCheckedRow: number,
 ): Promise<{ currentChanges: DDsData[], currentRemain: number }> {
   const response = await sheets.spreadsheets.values.batchGet({
     spreadsheetId,
-    ranges: [targetRange, IP_REMAIN_RANGE],
+    ranges: [`${DDS_LIST_NAME}!A${lastCheckedRow}:G`, `${DDS_LIST_NAME}!C4`],
     valueRenderOption: 'UNFORMATTED_VALUE',
   })
 
@@ -26,8 +26,8 @@ export async function getDDSData(
 
   const currentChanges: DDsData[] = changesValues.map((el) => {
     const title = typeof el[0] === 'string' ? el[0] : ''
-    const money = typeof el[5] === 'number' ? el[5] : 0
-    const description = typeof el[6] === 'string' ? el[6] : ''
+    const money = typeof el[3] === 'number' ? el[3] : 0
+    const description = typeof el[4] === 'string' ? el[4] : ''
     return { title, money, description }
   })
 

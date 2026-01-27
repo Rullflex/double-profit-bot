@@ -1,14 +1,18 @@
 import type { AppContext } from '@/core'
 import cron from 'node-cron'
+import { registerDdsNotificationsTask } from './ddsNotifications'
 import { registerRemainsTask } from './remains'
 
 export const enum TaskName {
   REMAINS = 'remains',
+  DDS_NOTIFICATIONS = 'dds-notifications',
 }
 
 export function registerTasks(app: AppContext) {
+  const ddsNotificationsTask = registerDdsNotificationsTask(app)
   const remainsTask = registerRemainsTask(app)
 
+  app.tasks.set(TaskName.DDS_NOTIFICATIONS, ddsNotificationsTask)
   app.tasks.set(TaskName.REMAINS, remainsTask)
 
   // в режиме разработки останавливаем все задачи

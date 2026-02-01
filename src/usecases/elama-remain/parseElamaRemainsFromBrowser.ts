@@ -9,6 +9,7 @@ import { sleep } from '@/shared/utils'
 const EMAIL = process.env.ELAMA_EMAIL!
 const PASSWORD = process.env.ELAMA_PASSWORD!
 const RUCAPTCHA_API_KEY = process.env.RUCAPTCHA_API_KEY!
+const IS_DEV = process.env.NODE_ENV === 'development'
 
 const logger = createLogger({ label: 'parseElamaRemainsFromBrowser' })
 
@@ -16,7 +17,7 @@ export async function parseElamaRemainsFromBrowser(logProgress: (message: string
   const browser = await puppeteer.launch({
     userDataDir: './user_data',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    headless: true,
+    headless: !IS_DEV,
   })
 
   try {

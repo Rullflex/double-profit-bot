@@ -15,6 +15,7 @@ const logger = createLogger({ label: 'parseElamaRemainsFromPage' })
 export async function parseElamaRemainsByBrowser(logProgress: (message: string) => void = logger.info) {
   const browser = await puppeteer.launch({
     userDataDir: './user_data',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
     headless: true,
   })
 

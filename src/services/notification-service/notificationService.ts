@@ -7,7 +7,11 @@ export function createNotification() {
   /** @see https://grammy.dev/ru/plugins/auto-retry */
   notificationBot.api.config.use(autoRetry())
 
+  function send(...args: Parameters<Bot['api']['sendMessage']>) {
+    return notificationBot.api.sendMessage(...args)
+  }
+
   return {
-    send: notificationBot.api.sendMessage,
+    send,
   }
 }

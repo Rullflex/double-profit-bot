@@ -2,7 +2,14 @@ import type { CommandContext, Context } from 'grammy'
 import type { AppContext } from '@/core/appContext'
 import { REPLY_MESSAGE } from '@/shared/consts'
 import { getFileBuffer } from '@/shared/utils'
+import { startElamaInvoiceUsecase } from '@/usecases/elama-invoice'
 import { processElamaRemains } from '@/usecases/elama-remain'
+
+export async function handleElamaInvoice(app: AppContext, ctx: CommandContext<Context>) {
+  await ctx.reply(REPLY_MESSAGE.ELAMA_INVOICE_START)
+  await startElamaInvoiceUsecase(app)
+  await ctx.reply(REPLY_MESSAGE.ELAMA_INVOICE_END)
+}
 
 export async function handleElamaAuto(app: AppContext, ctx: CommandContext<Context>) {
   const sent = await ctx.reply(REPLY_MESSAGE.ELAMA_COMMAND)

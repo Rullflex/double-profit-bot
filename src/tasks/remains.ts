@@ -32,11 +32,13 @@ export function registerRemainsTask(app: AppContext) {
 
     app.logger.info(`Elama remains processed: ${updatedCount} items updated`)
 
-    await sleep(10000) // ждем немного времени чтобы таблица excel успела обновиться наверняка и пересчитать значения
+    await sleep(5000) // ждем немного времени чтобы таблица excel успела обновиться наверняка и пересчитать значения
 
     const { totalTasks, successCount } = await processDailyReport(app)
 
     app.logger.info(`Daily report processed: ${successCount}/${totalTasks} reports sent`)
+
+    // TODO Elama_invoice
 
     return { updatedCount, totalTasks, successCount } satisfies RemainsTaskResult
   }, { timezone: 'Europe/Moscow', name: TaskName.REMAINS, noOverlap: true })

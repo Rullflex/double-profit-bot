@@ -11,7 +11,12 @@ export function createNotification() {
     return notificationBot.api.sendMessage(...args)
   }
 
+  function sendDocument(...args: Parameters<Bot['api']['sendDocument']>) {
+    return notificationBot.api.sendDocument(...args)
+  }
+
   return {
     send,
+    sendDocument,
   }
 }

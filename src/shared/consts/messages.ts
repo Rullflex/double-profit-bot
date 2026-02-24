@@ -14,6 +14,9 @@ Safari — «Сохранить как... → Веб-архив»`,
   ELAMA_INVALID_FILE: 'Ожидается HTML-файл. Пожалуйста, отправьте его.',
   ELAMA_SUCCESS_UPDATE: (count: number) => `Данные о свободных остатках по ${count} ${plural(count, ['филиалу', 'филиалам', 'филиалам'])} были обновлены`,
 
+  ELAMA_INVOICE_START: 'Начинаю выставление счетов на рекламный бюджет eLama',
+  ELAMA_INVOICE_END: 'Выставление счетов на рекламный бюджет eLama завершено',
+
   // messages from mass-message
   MASS_MESSAGE_SELECT_GROUP: 'Выбери группу чатов для рассылки:',
   MASS_MESSAGE_SEND_MESSAGE: 'Теперь напиши сообщение для рассылки.',

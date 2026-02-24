@@ -1,2 +1,3 @@
 export const DATA_SPREADSHEET_ID = process.env.DATA_SPREADSHEET_ID
 export const MONEY_SPREADSHEET_ID = process.env.MONEY_SPREADSHEET_ID
+export const MONEY_REMAIN_FIRST_ROW = 3

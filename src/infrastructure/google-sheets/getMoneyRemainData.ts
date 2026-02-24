@@ -1,5 +1,5 @@
 import type { sheets_v4 } from 'googleapis'
-import { MONEY_SPREADSHEET_ID } from './sheets.config'
+import { MONEY_REMAIN_FIRST_ROW, MONEY_SPREADSHEET_ID } from './sheets.config'
 
 export interface MoneyRemainData {
   title: string
@@ -8,7 +8,6 @@ export interface MoneyRemainData {
   elamaRemain: number
 }
 
-const MONEY_REMAIN_FIRST_ROW = 3
 const MONEY_REMAIN_RANGE = `Остатки!C${MONEY_REMAIN_FIRST_ROW}:G`
 const ELAMA_REMAIN_RANGE = `Остатки!G${MONEY_REMAIN_FIRST_ROW}:G`
 const UPDATE_TIME_RANGE = 'Остатки!G1:G1'

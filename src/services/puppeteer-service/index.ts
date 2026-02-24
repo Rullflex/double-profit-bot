@@ -2,8 +2,8 @@ import type { Browser, Page } from 'puppeteer'
 import fs from 'node:fs'
 import path from 'node:path'
 import puppeteer from 'puppeteer'
+import { IS_DEV } from '@/shared/consts'
 
-const IS_DEV = process.env.NODE_ENV === 'development'
 const IDLE_TIMEOUT_MS = 2 * 60 * 1000 // 2 минуты
 const SCREENSHOT_DIR = path.resolve('logs/screenshots')
 

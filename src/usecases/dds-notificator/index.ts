@@ -24,7 +24,7 @@ export async function startDdsNotificatorUsecase(app: AppContext) {
 
     let lastCheckedRow = rowMap[sheetId] || DEFAULT_DDS_ROW
 
-    const { currentChanges: changes, currentRemain: lastRemain } = await getDDSData(
+    const { currentChanges: changes } = await getDDSData(
       app.sheets,
       sheetId,
       lastCheckedRow,
@@ -36,11 +36,9 @@ export async function startDdsNotificatorUsecase(app: AppContext) {
     const chatId = extractChatId(customer.telegramChatRaw)
     const messages: string[] = []
 
-    let remain = lastRemain
     for (let i = changes.length - 1; i >= 0; i--) {
-      const msg = formatMessage(customer.title, changes[i], remain)
+      const msg = formatMessage(customer.title, changes[i])
       messages.push(msg)
-      remain -= changes[i].money
     }
 
     for (const msg of messages.reverse()) {
@@ -55,21 +53,30 @@ export async function startDdsNotificatorUsecase(app: AppContext) {
 }
 
 async function readJsonData(filePath: string) {
-  const content = await fs.readFile(filePath, 'utf-8')
-  if (!content)
-    return
-  return JSON.parse(content)
+  try {
+    const content = await fs.readFile(filePath, 'utf-8')
+    if (!content)
+      return
+    return JSON.parse(content)
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      await fs.writeFile(filePath, JSON.stringify({}), { mode: 0o700 })
+      return
+    }
+    throw error
+  }
 }
 
 async function writeJsonData(filePath: string, rowMap: Record<string, number>) {
   await fs.writeFile(filePath, JSON.stringify(rowMap), { mode: 0o700 })
 }
 
-function formatMessage(customer: string, dds: DDsData, remain: number): string {
-  const roundedRemain = Math.round(remain)
+function formatMessage(customer: string, dds: DDsData): string {
+  const roundedRemain = Math.round(dds.currentRemain)
   const roundedMoney = Math.round(Math.abs(dds.money))
   const changeType = dds.money > 0 ? 'Пополнение' : 'Расход'
   return `${customer}
-${changeType} на ${roundedMoney}р. ${dds.description}
-Свободный остаток ${roundedRemain}р.`
+${changeType} на ${roundedMoney} руб.
+${dds.description}
+Текущий баланс ${roundedRemain} руб.`
 }

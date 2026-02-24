@@ -28,7 +28,7 @@ export async function withBrowser<T>(
       const filePath = path.join(
         SCREENSHOT_DIR,
         `error-${Date.now()}.png`,
-      )
+      ) as `${string}.png`
 
       await page.screenshot({
         path: filePath,

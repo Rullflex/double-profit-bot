@@ -2,11 +2,10 @@ import type { AppContext } from '@/core/appContext'
 import type { DDsData } from '@/infrastructure/google-sheets'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { extractChatId, getCustomerData, getDDSData } from '@/infrastructure/google-sheets'
-import { extractSheetIdFromGLink } from '@/services/google-sheets-service'
+import { extractChatId, getCustomerData, getDDSData, getDDSSpreadsheetsData } from '@/infrastructure/google-sheets'
 
 const DEFAULT_DDS_ROW = 7
-const PATH_DDS_LAST_STATE = path.join(import.meta.dirname, 'dds-last-state.json')
+const PATH_DDS_LAST_STATE = path.resolve('dds-last-state.json')
 let rowMap: Record<string, number>
 
 export async function startDdsNotificatorUsecase(app: AppContext) {
@@ -14,42 +13,48 @@ export async function startDdsNotificatorUsecase(app: AppContext) {
     rowMap = await readJsonData(PATH_DDS_LAST_STATE) || {}
   }
 
+  const ddss = await getDDSSpreadsheetsData(app.sheets)
   const customers = await getCustomerData(app.sheets)
 
-  for (const customer of customers) {
-    const sheetId = extractSheetIdFromGLink(customer.gLink)
+  try {
+    for (const dds of ddss) {
+      if (!dds.spreadsheetId)
+        continue
 
-    if (!sheetId)
-      continue
+      let lastCheckedRow = rowMap[dds.spreadsheetId] || DEFAULT_DDS_ROW
 
-    let lastCheckedRow = rowMap[sheetId] || DEFAULT_DDS_ROW
+      const { currentChanges: changes } = await getDDSData(
+        app.sheets,
+        dds.spreadsheetId,
+        lastCheckedRow,
+      )
 
-    const { currentChanges: changes } = await getDDSData(
-      app.sheets,
-      sheetId,
-      lastCheckedRow,
-    )
+      if (!changes.length)
+        continue
 
-    if (!changes.length)
-      continue
+      const customer = customers.find(c => c.title.toLowerCase().includes(dds.clientName.toLowerCase()))
+      if (!customer)
+        continue
 
-    const chatId = extractChatId(customer.telegramChatRaw)
-    const messages: string[] = []
+      const chatId = extractChatId(customer.telegramChatRaw)
+      const messages: string[] = []
 
-    for (let i = changes.length - 1; i >= 0; i--) {
-      const msg = formatMessage(customer.title, changes[i])
-      messages.push(msg)
+      for (let i = changes.length - 1; i >= 0; i--) {
+        const msg = formatMessage(customer.title, changes[i])
+        messages.push(msg)
+      }
+
+      for (const msg of messages.reverse()) {
+        await app.notification.send(chatId, msg)
+        // console.log(`Would send to ${chatId}:\n${msg}\n---`)
+        lastCheckedRow++
+      }
+
+      rowMap[dds.spreadsheetId] = lastCheckedRow
     }
-
-    for (const msg of messages.reverse()) {
-      await app.notification.send(chatId, msg)
-      lastCheckedRow++
-    }
-
-    rowMap[sheetId] = lastCheckedRow
+  } finally {
+    await writeJsonData(PATH_DDS_LAST_STATE, rowMap)
   }
-
-  await writeJsonData(PATH_DDS_LAST_STATE, rowMap)
 }
 
 async function readJsonData(filePath: string) {

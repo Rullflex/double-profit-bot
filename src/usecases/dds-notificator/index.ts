@@ -2,7 +2,8 @@ import type { AppContext } from '@/core/appContext'
 import type { DDsData } from '@/infrastructure/google-sheets'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { extractChatId, getCustomerData, getDDSData, getDDSSpreadsheetsData } from '@/infrastructure/google-sheets'
+import { extractChatId, getCustomerData, getDDSData } from '@/infrastructure/google-sheets'
+import { extractSheetIdFromGLink } from '@/services/google-sheets-service'
 
 const DEFAULT_DDS_ROW = 7
 const PATH_DDS_LAST_STATE = path.resolve('dds-last-state.json')
@@ -13,46 +14,40 @@ export async function startDdsNotificatorUsecase(app: AppContext) {
     rowMap = await readJsonData(PATH_DDS_LAST_STATE) || {}
   }
 
-  const ddss = await getDDSSpreadsheetsData(app.sheets)
   const customers = await getCustomerData(app.sheets)
 
-  try {
-    for (const dds of ddss) {
-      if (!dds.spreadsheetId)
-        continue
+  for (const customer of customers) {
+    const sheetId = extractSheetIdFromGLink(customer.gLink)
 
-      let lastCheckedRow = rowMap[dds.spreadsheetId] || DEFAULT_DDS_ROW
+    if (!sheetId)
+      continue
 
-      const { currentChanges: changes } = await getDDSData(
-        app.sheets,
-        dds.spreadsheetId,
-        lastCheckedRow,
-      )
+    let lastCheckedRow = rowMap[sheetId] || DEFAULT_DDS_ROW
 
-      if (!changes.length)
-        continue
+    const { currentChanges: changes } = await getDDSData(
+      app.sheets,
+      sheetId,
+      lastCheckedRow,
+    )
 
-      const customer = customers.find(c => c.title.toLowerCase().includes(dds.clientName.toLowerCase()))
-      if (!customer)
-        continue
+    if (!changes.length)
+      continue
 
-      const chatId = extractChatId(customer.telegramChatRaw)
-      const messages: string[] = []
+    const chatId = extractChatId(customer.telegramChatRaw)
+    const messages: string[] = []
 
-      for (let i = changes.length - 1; i >= 0; i--) {
-        const msg = formatMessage(customer.title, changes[i])
-        messages.push(msg)
-      }
-
-      for (const msg of messages.reverse()) {
-        await app.notification.send(chatId, msg)
-        // console.log(`Would send to ${chatId}:\n${msg}\n---`)
-        lastCheckedRow++
-      }
-
-      rowMap[dds.spreadsheetId] = lastCheckedRow
+    for (let i = changes.length - 1; i >= 0; i--) {
+      const msg = formatMessage(customer.title, changes[i])
+      messages.push(msg)
     }
-  } finally {
+
+    for (const msg of messages.reverse()) {
+      await app.notification.send(chatId, msg)
+      // console.log(`Would send to ${chatId}:\n${msg}\n---`)
+      lastCheckedRow++
+    }
+
+    rowMap[sheetId] = lastCheckedRow
     await writeJsonData(PATH_DDS_LAST_STATE, rowMap)
   }
 }

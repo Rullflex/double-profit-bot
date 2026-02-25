@@ -32,7 +32,7 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index]
 
-      if (row && row.clientName && row.elamaId && row.invoiceAmount && row.shouldIssueInvoice === 'ДА' && row.needsCheckReminder === 'НУЖНО') {
+      if (row && row.clientName && row.elamaId && row.invoiceAmount && row.status === 'Активен' && row.shouldIssueInvoice === 'ДА' && row.needsCheckReminder === 'НУЖНО') {
         const targetCustomer = customers.find(c => c.title.toLowerCase().includes(row.clientName.toLowerCase()))
         if (!targetCustomer)
           continue

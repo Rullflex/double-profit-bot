@@ -2,6 +2,7 @@ import type { sheets_v4 } from 'googleapis'
 import { MONEY_REMAIN_FIRST_ROW, MONEY_SPREADSHEET_ID } from './sheets.config'
 
 export interface InvoiceData {
+  status: 'ПАУЗА' | 'Активен'
   clientName: string
   elamaId: number | null
   invoiceAmount: number | null
@@ -9,14 +10,14 @@ export interface InvoiceData {
   needsCheckReminder: 'НУЖНО' | 'НЕ НУЖНО'
 }
 
-// type InvoiceData = [nonExpiringAmount: number | '', invoiceAmount: number | '', shouldIssueInvoice: 'ДА' | 'НЕТ', lastInvoiceDate: number | '', needsCheckReminder: 'НУЖНО' | 'НЕ НУЖНО']
+// type InvoiceData = [status: 'ПАУЗА' | 'Активен', nonExpiringAmount: number | '', invoiceAmount: number | '', shouldIssueInvoice: 'ДА' | 'НЕТ', lastInvoiceDate: number | '', needsCheckReminder: 'НУЖНО' | 'НЕ НУЖНО']
 
 export async function getInvoiceData(
   sheets: sheets_v4.Sheets,
 ): Promise<InvoiceData[] | null> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: MONEY_SPREADSHEET_ID,
-    range: `Остатки!C${MONEY_REMAIN_FIRST_ROW}:M`,
+    range: `Остатки!B${MONEY_REMAIN_FIRST_ROW}:M`,
     valueRenderOption: 'UNFORMATTED_VALUE',
   })
 
@@ -29,9 +30,10 @@ export async function getInvoiceData(
       return null
     }
 
-    const [clientName, _manager, elamaId, _ipRemain, _elamaRemain, _, _nonExpiringAmount, invoiceAmount, shouldIssueInvoice, _lastInvoiceDate, needsCheckReminder] = row
+    const [status, clientName, _manager, elamaId, _ipRemain, _elamaRemain, _, _nonExpiringAmount, invoiceAmount, shouldIssueInvoice, _lastInvoiceDate, needsCheckReminder] = row
 
     return {
+      status,
       clientName,
       elamaId: typeof elamaId === 'number' ? elamaId : null,
       invoiceAmount: typeof invoiceAmount === 'number' ? invoiceAmount : null,

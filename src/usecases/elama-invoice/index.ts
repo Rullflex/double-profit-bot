@@ -46,6 +46,7 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
           visible: true,
         }).then(el => el?.click())
 
+        await sleep(300)
         const modal = await page.waitForSelector('[data-test="Modal"]', { visible: true })
         await modal.waitForSelector('[data-test="Field.contractId"]', { visible: true }).then(el => el?.click())
         const contractOptions = await modal.waitForSelector('[data-test="Field.contractId__optionList"]', { visible: true })
@@ -60,11 +61,13 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
           continue
         }
 
+        await sleep(300)
         await page.waitForSelector('button[type="submit"]::-p-text(Выставить счет)', { visible: true }).then(el => el?.click())
 
         // состояние ДО клика
         const filesBefore = new Set(await fs.readdir(downloadDir))
 
+        await sleep(300)
         await page.waitForSelector('button[type="button"]::-p-text(Сохранить .pdf)', { visible: true }).then(el => el?.click())
         // ждём появления нового файла
         let downloadedFile: string | null = null

@@ -76,7 +76,7 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
           await sleep(500)
 
           const filesAfter = await fs.readdir(downloadDir)
-          const diff = filesAfter.find(f => !filesBefore.has(f))
+          const diff = filesAfter.find(f => !filesBefore.has(f) && !f.endsWith('.crdownload'))
 
           if (diff) {
             downloadedFile = diff

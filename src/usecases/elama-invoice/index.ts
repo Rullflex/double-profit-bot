@@ -46,7 +46,7 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
           visible: true,
         }).then(el => el?.click())
 
-        await sleep(300)
+        await sleep(1000)
         const modal = await page.waitForSelector('[data-test="Modal"]', { visible: true })
         await modal.waitForSelector('[data-test="Field.contractId"]', { visible: true }).then(el => el?.click())
         const contractOptions = await modal.waitForSelector('[data-test="Field.contractId__optionList"]', { visible: true })

@@ -42,6 +42,8 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
         await page.waitForSelector('[data-test="AgencyClientsFilter__TransparentInput"]').then(el => el?.type(String(row.elamaId)))
         await page.keyboard.press('Enter')
 
+        await sleep(500)
+
         await page.waitForSelector('[data-test="Agency_clientList"] >>> button::-p-text(Выставить счет)', {
           visible: true,
         }).then(el => el?.click())

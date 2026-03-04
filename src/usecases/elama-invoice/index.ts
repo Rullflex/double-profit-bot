@@ -74,7 +74,7 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
         // ждём появления нового файла
         let downloadedFile: string | null = null
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 60; i++) {
           await sleep(500)
 
           const filesAfter = await fs.readdir(downloadDir)

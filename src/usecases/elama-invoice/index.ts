@@ -93,7 +93,7 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
         if (!downloadedFile) {
           const filesAtEnd = await fs.readdir(downloadDir)
           app.logger.error(`Download failed. Initial: ${Array.from(filesBefore).join(', ')}, Final: ${filesAtEnd.join(', ')}`)
-          throw new Error('Файл не был скачан')
+          throw new Error(`Файл не был скачан. \nElamaId: ${row.elamaId} \nКлиент: ${row.clientName}`)
         }
 
         const filePath = path.join(downloadDir, downloadedFile)

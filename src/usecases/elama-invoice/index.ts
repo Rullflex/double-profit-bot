@@ -74,7 +74,7 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
         // ждём появления нового файла
         let downloadedFile: string | null = null
 
-        for (let i = 0; i < 60; i++) {
+        for (let i = 0; i < 120; i++) {
           await sleep(500)
 
           const filesAfter = await fs.readdir(downloadDir)
@@ -82,12 +82,19 @@ export async function startElamaInvoiceUsecase(app: AppContext) {
 
           if (diff) {
             downloadedFile = diff
-            break
+            // Дополнительная проверка: убедитесь что файл полностью скачан
+            const stats = await fs.stat(path.join(downloadDir, diff))
+            if (stats.size > 0) {
+              break
+            }
           }
         }
 
-        if (!downloadedFile)
+        if (!downloadedFile) {
+          const filesAtEnd = await fs.readdir(downloadDir)
+          app.logger.error(`Download failed. Initial: ${Array.from(filesBefore).join(', ')}, Final: ${filesAtEnd.join(', ')}`)
           throw new Error('Файл не был скачан')
+        }
 
         const filePath = path.join(downloadDir, downloadedFile)
 
